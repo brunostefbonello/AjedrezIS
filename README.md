@@ -9,6 +9,7 @@ TPO de Ingeniería de Software (UADE). Java 21 + Maven + JUnit 5.
   - `commands/` — MoveCommand y el historial (undo)
   - `state/` — estados de la partida (turnos)
   - `ports/` — interfaces de entrada y salida
+  - `game/` — ChessGame, implementa el puerto de entrada
 - `adapters/console/` — UI de consola y el `main`
 - `src/test/` — tests (AAA). `doubles/` para fakes, stubs y mocks.
 
@@ -17,3 +18,4 @@ TPO de Ingeniería de Software (UADE). Java 21 + Maven + JUnit 5.
 - Nunca push directo a `main`: rama propia + pull request.
 - Toda pieza hereda de `Piece` e implementa `canMoveTo()`, con sus tests.
 
+Las reglas completas de trabajo están en [CONVENIO.md](CONVENIO.md).
