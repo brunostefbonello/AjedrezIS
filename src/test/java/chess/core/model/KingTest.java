@@ -34,4 +34,23 @@ class KingTest {
         // espero false: se movió 2 casillas
         assertFalse(result);
     }
+
+    @Test
+    void kingCanCaptureEnemyPieceWithinOneSquare() {
+        // Arrange
+        Board board = new Board();
+        King king = new King(Color.WHITE);
+        Position from = new Position(3, 3);
+        Position to = new Position(4, 4);
+
+        board.setPiece(from, king);
+        board.setPiece(to, new King(Color.BLACK)); // Pieza rival en diagonal
+
+        // Act
+        boolean result = king.canMoveTo(from, to, board);
+
+        // Assert
+        // espero true: el rey captura moviéndose 1 casilla en diagonal
+        assertTrue(result);
+    }
 }

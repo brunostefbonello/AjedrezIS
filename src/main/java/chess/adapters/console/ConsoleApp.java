@@ -3,6 +3,8 @@ package chess.adapters.console;
 import chess.core.game.ChessGame;
 import chess.core.model.Board;
 //import chess.core.model.BoardSetup;
+import chess.core.model.Color;
+import chess.core.model.King;
 import chess.core.model.Position;
 import chess.core.ports.IGameService;
 import chess.core.ports.MoveResult;
@@ -16,13 +18,21 @@ public class ConsoleApp {
 
     public static void main(String[] args) {
         // Ensamble de dependencias (único lugar permitido con new)
-       Board board = new Board(); //instanciacion del tablero, temporal hasta hacerlo escalable
+       Board board = new Board(); //instanciacion del tablero
+
+        /*automatizar instanciacion de piezas en el board
+
+        board.setPiece(new Position(0, 4), new King(Color.WHITE)); // Rey blanco en e1
+    board.setPiece(new Position(7, 4), new King(Color.BLACK)); // Rey negro en e8
+    board.setPiece(new Position(1, 4), new King(Color.BLACK));
+         */
+
         MoveValidator validator = new MoveValidator();
         MoveHistory history = new MoveHistory();
         IGameService game = new ChessGame(board, validator, history, new WhiteTurnState());
 
-        ConsoleRenderer renderer = new ConsoleRenderer(8,8);
-        NotationParser parser = new NotationParser(8,8);
+        ConsoleRenderer renderer = new ConsoleRenderer();
+        NotationParser parser = new NotationParser();
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("=== Ajedrez IS ===");

@@ -7,53 +7,31 @@ import chess.core.ports.IGameService;
 
 public class ConsoleRenderer {
 
-    private final int totalRows;
-    private final int totalCols;
-
-    // Constructor que permite cualquier dimensión (8x8, 10x10, etc.)
-    public ConsoleRenderer(int totalRows, int totalCols) {
-        this.totalRows = totalRows;
-        this.totalCols = totalCols;
+    // Constructor por defecto sin argumentos
+    public ConsoleRenderer() {
     }
 
     public void render(IGameService game) {
-        printColumnLabels();
-        printSeparator();
+        System.out.println("\n    a   b   c   d   e   f   g   h");
+        System.out.println("  +---+---+---+---+---+---+---+---+");
 
-        for (int row = totalRows - 1; row >= 0; row--) {
-            // Imprime número de fila alineado
-            System.out.printf("%2d |", (row + 1));
-            for (int col = 0; col < totalCols; col++) {
+        // Fila 8 (row 7) arriba hasta fila 1 (row 0) abajo
+        for (int row = 7; row >= 0; row--) {
+            System.out.print((row + 1) + " |");
+            for (int col = 0; col < 8; col++) {
                 Piece piece = game.pieceAt(new Position(row, col));
                 System.out.print(" " + getPieceSymbol(piece) + " |");
             }
-            System.out.printf(" %-2d\n", (row + 1));
-            printSeparator();
+            System.out.println(" " + (row + 1));
+            System.out.println("  +---+---+---+---+---+---+---+---+");
         }
-
-        printColumnLabels();
-        System.out.println();
-    }
-
-    private void printColumnLabels() {
-        System.out.print("     ");
-        for (int col = 0; col < totalCols; col++) {
-            char colLetter = (char) ('a' + col);
-            System.out.print(colLetter + "   ");
-        }
-        System.out.println();
-    }
-
-    private void printSeparator() {
-        System.out.print("   +");
-        for (int col = 0; col < totalCols; col++) {
-            System.out.print("---+");
-        }
-        System.out.println();
+        System.out.println("    a   b   c   d   e   f   g   h\n");
     }
 
     private String getPieceSymbol(Piece piece) {
-        if (piece == null) return " ";
+        if (piece == null) {
+            return " ";
+        }
         String name = piece.getClass().getSimpleName();
         char letter = switch (name) {
             case "King" -> 'K';
@@ -64,6 +42,7 @@ public class ConsoleRenderer {
             case "Pawn" -> 'P';
             default -> '?';
         };
+
         return piece.color() == Color.WHITE
                 ? String.valueOf(letter).toUpperCase()
                 : String.valueOf(letter).toLowerCase();
