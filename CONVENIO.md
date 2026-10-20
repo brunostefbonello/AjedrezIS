@@ -116,19 +116,9 @@ public class ScoreBoard {
     public void subtract(Color color, int amount)
 }
 
-// movement/  🆕 (ya hechas)
-public class StraightMovement implements MovementStrategy     // torre
-public class DiagonalMovement implements MovementStrategy     // alfil
-public class CombinedMovement implements MovementStrategy {   // reina = Straight + Diagonal
-    public CombinedMovement(MovementStrategy... options)       // puede si CUALQUIERA puede
-}
-
 // setup/  🆕 Único lugar que decide qué estrategia lleva cada pieza.
-public final class Pieces {
-    public static Piece rook(Color color)
-    public static Piece bishop(Color color)
-    public static Piece queen(Color color)
-}
+// Está vacía: cada integrante agrega el método de sus piezas (ver "A agregar").
+public final class Pieces { }
 
 // rules/
 public class MoveValidator {
@@ -189,6 +179,13 @@ new ChessWindow(game);
 ### A agregar
 
 ```java
+// movement/ — Integrante B (migrar Rook, Bishop y Queen: la lógica es la misma de antes)
+public class StraightMovement implements MovementStrategy     // torre
+public class DiagonalMovement implements MovementStrategy     // alfil
+public class CombinedMovement implements MovementStrategy {   // reina = Straight + Diagonal
+    public CombinedMovement(MovementStrategy... options)       // puede si CUALQUIERA puede
+}
+
 // movement/ — Integrante C
 public class KnightMovement implements MovementStrategy   // en L, salta piezas (NO usa isPathClear)
 public class PawnMovement implements MovementStrategy
@@ -200,6 +197,9 @@ public class PawnMovement implements MovementStrategy
 public class KingMovement implements MovementStrategy     // 1 casilla en cualquier dirección
 
 // setup/ — cada uno agrega el suyo a Pieces
+public static Piece rook(Color color)                     // B
+public static Piece bishop(Color color)                   // B
+public static Piece queen(Color color)                    // B: new CombinedMovement(new StraightMovement(), new DiagonalMovement())
 public static Piece knight(Color color)                   // C
 public static Piece pawn(Color color)                     // C
 public static Piece king(Color color)                     // D
@@ -247,8 +247,8 @@ public class PieceSymbols  // PieceType + Color → símbolo Unicode (♔♕♖�
 
 | Integrante | Responsabilidad | Archivos |
 |---|---|---|
-| **A — Bruno** | Núcleo, integración, diagrama. Revisa los PR. | ✅ `Piece` + Strategy, `PieceType`, `ScoreBoard`, puntaje en comandos, `ChessGame`. Pendiente: `BoardSetup`, diagrama de clases |
-| **B — Gonzalo** | Piezas que se deslizan + camino libre | ✅ `isPathClear`, y su lógica de torre/alfil/reina ya migrada a `StraightMovement`, `DiagonalMovement`, `CombinedMovement`. **Revisar la migración** |
+| **A — Bruno** | Núcleo, integración, diagrama. Revisa los PR. | ✅ `Piece` + `MovementStrategy`, `PieceType`, `ScoreBoard`, puntaje en comandos, `ChessGame`. Pendiente: `BoardSetup`, diagrama de clases |
+| **B — Gonzalo** | Piezas que se deslizan + camino libre | ✅ `isPathClear`. Pendiente: migrar torre/alfil/reina a `StraightMovement`, `DiagonalMovement`, `CombinedMovement` + `Pieces.rook/bishop/queen` + sus tests |
 | **C** | Caballo y peón | `KnightMovement`, `PawnMovement`, `Pieces.knight/pawn` |
 | **D** | Rey, turnos y ventana | `KingMovement`, `Pieces.king`, `WhiteTurn`, `BlackTurn`, `GameOver`, `SwingApp`, `ChessWindow`, `PieceSymbols` |
 
@@ -259,10 +259,11 @@ Cada uno escribe **los tests de sus propias clases** (la ventana Swing no se tes
 ### Orden
 
 1. **Hecho:** todo lo marcado ✅ arriba.
-2. **En paralelo, desde ya:** `KnightMovement`, `PawnMovement` (C), `KingMovement` y los estados (D). Nadie depende de nadie.
-3. **Cuando las 6 piezas estén en `main` (A):** `BoardSetup.standard()`.
-4. **Ventana (D):** puede arrancar ya con un tablero armado a mano (unas torres y alfiles con `Pieces`) y cambiar a `BoardSetup.standard()` cuando exista.
-5. **Al final (A, con revisión de todos):** diagrama de clases UML.
+2. **Primero, B:** la migración de torre/alfil/reina. Como `Piece` cambió de forma, las clases viejas ya no compilan: B crea su rama **desde `feature/strategy-scoring`** y abre su PR **contra esa rama** (no contra `main`). Cuando entra, se mergea todo junto a `main`.
+3. **En paralelo con B:** `KnightMovement`, `PawnMovement` (C), `KingMovement` y los estados (D). Nadie depende de nadie. Mientras `feature/strategy-scoring` no esté en `main`, C y D también crean sus ramas desde ahí, porque necesitan la `Piece` nueva.
+4. **Cuando las 6 piezas estén en `main` (A):** `BoardSetup.standard()`.
+5. **Ventana (D):** puede arrancar ya con un tablero armado a mano (unas torres y alfiles con `Pieces`) y cambiar a `BoardSetup.standard()` cuando exista.
+6. **Al final (A, con revisión de todos):** diagrama de clases UML.
 
 ---
 
