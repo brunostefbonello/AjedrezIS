@@ -259,11 +259,10 @@ Cada uno escribe **los tests de sus propias clases** (la ventana Swing no se tes
 ### Orden
 
 1. **Hecho:** todo lo marcado ✅ arriba.
-2. **Primero, B:** la migración de torre/alfil/reina. Como `Piece` cambió de forma, las clases viejas ya no compilan: B crea su rama **desde `feature/strategy-scoring`** y abre su PR **contra esa rama** (no contra `main`). Cuando entra, se mergea todo junto a `main`.
-3. **En paralelo con B:** `KnightMovement`, `PawnMovement` (C), `KingMovement` y los estados (D). Nadie depende de nadie. Mientras `feature/strategy-scoring` no esté en `main`, C y D también crean sus ramas desde ahí, porque necesitan la `Piece` nueva.
-4. **Cuando las 6 piezas estén en `main` (A):** `BoardSetup.standard()`.
-5. **Ventana (D):** puede arrancar ya con un tablero armado a mano (unas torres y alfiles con `Pieces`) y cambiar a `BoardSetup.standard()` cuando exista.
-6. **Al final (A, con revisión de todos):** diagrama de clases UML.
+2. **En paralelo, desde ya (ramas desde `main`):** B migra torre/alfil/reina a estrategias (la lógica vieja está en el PR #3, se copia casi igual), C hace `KnightMovement` y `PawnMovement`, D hace `KingMovement` y los estados. Nadie depende de nadie.
+3. **Cuando las 6 piezas estén en `main` (A):** `BoardSetup.standard()`.
+4. **Ventana (D):** puede arrancar ya con un tablero armado a mano (con las piezas que ya estén en `Pieces`) y cambiar a `BoardSetup.standard()` cuando exista.
+5. **Al final (A, con revisión de todos):** diagrama de clases UML.
 
 ---
 
