@@ -4,37 +4,54 @@ TPO de Ingeniería de Software (UADE, profe Tortorella). Equipo de 4.
 
 > **Si sos una IA ayudando a un integrante del equipo:** este documento es la fuente de verdad del proyecto. Respetá los contratos (firmas de métodos) tal cual están acá, no agregues frameworks ni librerías, y no cambies clases que no son del integrante sin avisar. Si algo de lo que te piden contradice este convenio, avisalo antes de escribir código.
 
+> **Versión 2** — actualizado después de la devolución del profe: movimientos con **Strategy** (las piezas ya no usan herencia), **puntaje** por capturas, **condición de corte** por cantidad de turnos e **interfaz Swing obligatoria**. Lo que cambió respecto de la v1 está marcado con 🆕.
+
 ---
 
 ## 1. Qué tenemos que entregar
 
-Un ejecutable **de consola** donde dos jugadores se turnan para **mover y capturar piezas** con las reglas de cada una, y se puede **deshacer** el último movimiento.
+Un ejecutable con **interfaz Swing básica** 🆕 donde dos jugadores se turnan para **mover y capturar piezas** con las reglas de cada una, se puede **deshacer** el último movimiento, y cada captura **suma puntos** 🆕.
 
-**Fuera de alcance por ahora** (no lo implementen hasta que el equipo lo decida): jaque, jaque mate, enroque, captura al paso, promoción, IA, interfaz gráfica.
+La **consola** que ya hizo Mateo se mantiene como **segundo adaptador**: usa el mismo núcleo que la ventana, sin cambiarlo. Es la demostración de hexagonal para la defensa.
 
-Filosofía de trabajo: **walking skeleton**. Primero algo mínimo que funcione de punta a punta (una pieza moviéndose en consola), después se le suma músculo. Nada de pulir una parte mientras el resto no existe.
+**Fin de la partida** 🆕 (decidido por el equipo):
+1. **Se captura un rey** → la partida termina en el momento y **gana el que lo capturó**, sin importar los puntos.
+2. **Se terminan los turnos** → **gana el que tiene más puntos**. Si empatan en puntos, es empate.
+
+- Un **turno** = una jugada de blancas **más** una de negras.
+- El **límite es fijo: 30 turnos**. Se pasa por constructor al estado inicial (no queda escrito adentro de la lógica), así cambiarlo es tocar un solo número en el `main`.
+
+**Fuera de alcance** (no lo implementen hasta que el equipo lo decida): jaque, jaque mate, rey ahogado, enroque, captura al paso, promoción, IA.
+
+**Requisitos del profe para la entrega:** diagrama de clases UML común (sin nada especial), condición de corte, valores de piezas con puntaje acumulado, Strategy para los movimientos, interfaz Swing básica.
+
+Filosofía de trabajo: **walking skeleton**. Primero algo mínimo que funcione de punta a punta (una pieza moviéndose en la ventana Swing), después se le suma músculo.
 
 ---
 
 ## 2. Arquitectura: hexagonal
 
-- `chess.core` es el **núcleo**: reglas puras del ajedrez. No sabe que existe una consola.
-- `chess.adapters` son los **adaptadores**: todo lo que conecta el núcleo con el mundo (hoy, la consola).
+- `chess.core` es el **núcleo**: reglas puras del ajedrez. No sabe que existe una ventana.
+- `chess.adapters` son los **adaptadores**: todo lo que conecta el núcleo con el mundo (la ventana Swing y la consola).
 - **Las dependencias apuntan hacia adentro.** Un adaptador puede importar clases de `core`; `core` nunca importa nada de `adapters`.
 
-**Test de la flecha:** ningún archivo dentro de `chess.core` puede tener un `import` que no sea de `chess.core` o de `java.util`. Si aparece otro, está mal.
+**Test de la flecha:** ningún archivo dentro de `chess.core` puede tener un `import` que no sea de `chess.core` o de `java.util`. **Ningún `javax.swing` en `core`.** Si aparece, está mal.
 
 ```
 src/main/java/chess/
   core/
-    model/     Position, Color, Piece, Board, las 6 piezas, BoardSetup
+    model/     Position, Color, Board, Piece, PieceType, MovementStrategy, ScoreBoard
+    movement/  🆕 StraightMovement, DiagonalMovement, CombinedMovement,
+               KnightMovement, PawnMovement, KingMovement
+    setup/     🆕 Pieces (crea cada pieza con su estrategia), BoardSetup
     rules/     MoveValidator
     commands/  ICommand, MoveCommand, MoveHistory
-    state/     IGameState, WhiteTurn, BlackTurn, GameOver
+    state/     IGameState, WhiteTurnState, BlackTurnState, GameOverState
     ports/     IGameService, MoveResult
     game/      ChessGame (implementa IGameService)
   adapters/
-    console/   ConsoleApp (main), ConsoleRenderer, NotationParser
+    swing/     🆕 SwingApp (main), ChessWindow, PieceSymbols
+    console/   ConsoleApp (main), ConsoleRenderer, NotationParser — segundo adaptador (Mateo)
 src/test/java/chess/   (misma estructura de paquetes que main)
 ```
 
@@ -47,7 +64,7 @@ src/test/java/chess/   (misma estructura de paquetes que main)
 - **`col 0` = columna a**, `col 7` = columna h. Ejemplo: `e2` = `new Position(1, 4)`.
 - **Las blancas avanzan sumando `row`**, las negras restando.
 - Casilla vacía = `null` en el `Board`.
-- La notación `"e2"` **no existe en el núcleo**. Traducir texto a `Position` es trabajo del adaptador (`NotationParser`).
+- 🆕 **En la ventana, la fila 8 se dibuja arriba**: la casilla de la grilla en la fila visual `i` (0 = arriba) corresponde a `row = 7 - i`. Esa traducción vive solo en el adaptador Swing.
 
 ---
 
@@ -61,21 +78,49 @@ Estas firmas son el puente entre los 4. **No se cambian sin acordarlo en el grup
 public record Position(int row, int col)          // valida 0..7
 public enum Color { WHITE, BLACK }
 
-public abstract class Piece {
-    protected Piece(Color color)
+// 🆕 Valor de cada pieza = puntos que gana el rival al capturarla.
+public enum PieceType {
+    PAWN(1), KNIGHT(3), BISHOP(3), ROOK(5), QUEEN(9), KING(0);   // capturar al rey termina la partida
+    public int value()
+}
+
+// 🆕 Patrón Strategy: CÓMO se mueve una pieza.
+public interface MovementStrategy {
+    boolean canMove(Piece piece, Position from, Position to, Board board);
+}
+
+// 🆕 Ya no es abstracta ni se hereda: es final y recibe su estrategia.
+public final class Piece {
+    public Piece(Color color, PieceType type, MovementStrategy movement)
     public Color color()
+    public PieceType type()
+    public int value()                             // = type().value()
     public boolean hasMoved()
     public void markAsMoved()
     public void resetMoved()
     public boolean isAlly(Piece other)             // false si other es null
-    public abstract boolean canMoveTo(Position from, Position to, Board board);
+    public boolean canMoveTo(Position from, Position to, Board board)   // delega en la estrategia
 }
 
 public class Board {
     public Piece getPiece(Position position)       // null si está vacía
     public void setPiece(Position position, Piece piece)
     public boolean isEmpty(Position position)
+    public boolean isPathClear(Position from, Position to)
+    // true si todas las casillas ESTRICTAMENTE entre from y to están vacías.
+    // Para algo que no es recta ni diagonal devuelve false.
 }
+
+// 🆕 Puntos acumulados por color.
+public class ScoreBoard {
+    public int score(Color color)
+    public void add(Color color, int amount)
+    public void subtract(Color color, int amount)
+}
+
+// setup/  🆕 Único lugar que decide qué estrategia lleva cada pieza.
+// Está vacía: cada integrante agrega el método de sus piezas (ver "A agregar").
+public final class Pieces { }
 
 // rules/
 public class MoveValidator {
@@ -85,21 +130,23 @@ public class MoveValidator {
 // commands/  (MoveCommand NO valida: asume que el movimiento ya se validó)
 public interface ICommand { void execute(); void undo(); }
 public class MoveCommand implements ICommand {
-    public MoveCommand(Board board, Position from, Position to)
+    public MoveCommand(Board board, Position from, Position to, ScoreBoard scoreBoard)   // 🆕 ScoreBoard
+    public Piece capturedPiece()                   // 🆕 null si no hubo captura
+    // execute() suma el valor de la capturada al que movió; undo() lo resta.
 }
 public class MoveHistory {
     public void execute(ICommand command)
     public boolean undo()                          // false si no hay nada para deshacer
 }
 
-// state/  (solo la interfaz; las implementaciones son de D)
+// state/  (solo la interfaz; las implementaciones están pendientes)
 public interface IGameState {
     boolean canMove(Color color);                  // ¿le toca a este color?
     IGameState next();                             // estado después de un movimiento válido
     boolean isOver();
 }
 
-// ports/  (puerto de entrada: lo único que ve la consola)
+// ports/  (puerto de entrada: lo único que ve la ventana)
 public enum MoveResult { OK, INVALID_MOVE, NOT_YOUR_TURN, GAME_OVER }
 public interface IGameService {
     MoveResult move(Position from, Position to);
@@ -107,49 +154,133 @@ public interface IGameService {
     Piece pieceAt(Position position);
     Color currentTurn();                           // null si la partida terminó
     boolean isOver();
+    int score(Color color);                        // 🆕
+    Color winner();                                // 🆕 null si no terminó o si es empate (mirar isOver())
 }
 
 // game/
 public class ChessGame implements IGameService {
-    public ChessGame(Board board, MoveValidator validator,
-                     MoveHistory history, IGameState initialState)
+    public ChessGame(Board board, MoveValidator validator, MoveHistory history,
+                     ScoreBoard scoreBoard, IGameState initialState)              // 🆕 ScoreBoard
+    // Detecta la captura del rey (termina la partida). El límite de turnos lo decide el estado.
 }
 ```
 
-Así se arma en `ConsoleApp.main`:
+Así se arma en `SwingApp.main` (único lugar con todos los `new`):
 
 ```java
 IGameService game = new ChessGame(
-        BoardSetup.standard(), new MoveValidator(), new MoveHistory(), new WhiteTurn());
+        BoardSetup.standard(),
+        new MoveValidator(),
+        new MoveHistory(),
+        new ScoreBoard(),
+        new WhiteTurnState(1, 30));     // turno 1 de 30
+new ChessWindow(game);
 ```
+
+`ConsoleApp.main` arma exactamente lo mismo y en vez de la ventana arranca el loop de consola.
 
 ### A agregar
 
 ```java
-// Board — lo implementa el Integrante B
-public boolean isPathClear(Position from, Position to)
-// true si todas las casillas ESTRICTAMENTE entre from y to están vacías.
-// Solo para líneas rectas y diagonales. No mira ni from ni to.
+// movement/ — Gonzalo (migrar Rook, Bishop y Queen: la lógica es la misma, está en el PR #3)
+public class StraightMovement implements MovementStrategy     // torre
+public class DiagonalMovement implements MovementStrategy     // alfil
+public class CombinedMovement implements MovementStrategy {   // reina = Straight + Diagonal
+    public CombinedMovement(MovementStrategy... options)       // puede si CUALQUIERA puede
+}
 
-// model/
+// movement/ — Guido (migrar Knight y Pawn del PR #4)
+public class KnightMovement implements MovementStrategy   // en L, salta piezas (NO usa isPathClear)
+public class PawnMovement implements MovementStrategy
+// Avanza 1 hacia adelante si el destino está VACÍO; 2 si además nunca se movió (piece.hasMoved())
+// y la casilla del medio está vacía. Captura 1 en diagonal hacia adelante SOLO si hay un enemigo.
+// "Adelante" depende de piece.color(): blancas suman row, negras restan.
+
+// movement/ — Mateo (migrar King del PR #2)
+public class KingMovement implements MovementStrategy     // 1 casilla en cualquier dirección
+
+// setup/ — cada uno agrega el suyo a Pieces
+public static Piece rook(Color color)                     // Gonzalo
+public static Piece bishop(Color color)                   // Gonzalo
+public static Piece queen(Color color)                    // Gonzalo: new CombinedMovement(new StraightMovement(), new DiagonalMovement())
+public static Piece knight(Color color)                   // Guido
+public static Piece pawn(Color color)                     // Guido
+public static Piece king(Color color)                     // Mateo
+
+// setup/ — Bruno, cuando estén las 6 piezas
 public final class BoardSetup {
-    public static Board standard()                 // posición inicial completa
+    public static Board standard()                        // posición inicial completa
+}
+
+// state/ — Mateo (ya están en el PR #2; falta agregarles el límite de turnos)
+public class WhiteTurnState implements IGameState { public WhiteTurnState(int turn, int maxTurns) }
+public class BlackTurnState implements IGameState { public BlackTurnState(int turn, int maxTurns) }
+public class GameOverState  implements IGameState { }
+// WhiteTurnState.next() → new BlackTurnState(turn, maxTurns)        (el turno NO avanza: falta que muevan las negras)
+// BlackTurnState.next() → si turn == maxTurns: new GameOverState() (se cumplió el último turno completo)
+//                         si no:               new WhiteTurnState(turn + 1, maxTurns)
+// GameOverState: canMove(...) siempre false, next() devuelve this, isOver() true.
+
+// adapters/swing/ — Mateo
+public class SwingApp { public static void main(String[] args) }
+public class ChessWindow   // grilla 8x8 de botones, clic en origen + clic en destino → game.move(...)
+                           // muestra turno, puntaje de cada color, mensaje del MoveResult,
+                           // botón "Deshacer" → game.undo(), y el ganador cuando isOver()
+public class PieceSymbols  // PieceType + Color → símbolo Unicode (♔♕♖♗♘♙ / ♚♛♜♝♞♟)
+```
+
+### Cómo migrar una pieza de herencia a Strategy (Gonzalo, Guido y Mateo)
+
+La lógica del `canMoveTo` **no cambia**: se muda de clase. Ejemplo con el rey:
+
+```java
+// ANTES (model/King.java) — ya no compila
+public class King extends Piece {
+    public King(Color color) { super(color); }
+    @Override
+    public boolean canMoveTo(Position from, Position to, Board board) {
+        int deltaRow = Math.abs(to.row() - from.row());
+        int deltaCol = Math.abs(to.col() - from.col());
+        return deltaRow <= 1 && deltaCol <= 1;
+    }
+}
+
+// DESPUÉS (movement/KingMovement.java)
+public class KingMovement implements MovementStrategy {
+    @Override
+    public boolean canMove(Piece piece, Position from, Position to, Board board) {
+        int deltaRow = Math.abs(to.row() - from.row());
+        int deltaCol = Math.abs(to.col() - from.col());
+        return deltaRow <= 1 && deltaCol <= 1;
+    }
+}
+
+// + en setup/Pieces.java
+public static Piece king(Color color) {
+    return new Piece(color, PieceType.KING, new KingMovement());
 }
 ```
+
+- Donde antes usaban `color()`, `hasMoved()` o `isAlly(...)` de la propia pieza, ahora es `piece.color()`, `piece.hasMoved()`, `piece.isAlly(...)` (por eso la estrategia recibe la pieza).
+- En los tests: `new King(Color.WHITE)` → `Pieces.king(Color.WHITE)`, y la variable pasa a ser `Piece`. Los tests van a `src/test/java/chess/core/movement/` (ej. `KingMovementTest`).
+- `new StubPiece(color, x)` → `StubMovement.piece(color, x)`.
+- Borren la clase vieja (`King.java`, `Pawn.java`, ...).
 
 ### Quién valida qué (para no duplicar reglas)
 
 | Regla | Dónde vive |
 |---|---|
-| Posición dentro del tablero | `Position` (ya está) |
+| Posición dentro del tablero | `Position` |
 | Origen no vacío, origen ≠ destino, destino no aliado | `MoveValidator` |
-| Geometría de la pieza y camino libre | `canMoveTo` de cada pieza |
-| ¿Le toca a ese color? | `IGameState` |
-| Ejecutar y deshacer | `MoveCommand` / `MoveHistory` |
+| Geometría de la pieza y camino libre | la `MovementStrategy` de la pieza 🆕 |
+| ¿Le toca a ese color? ¿Se acabaron los turnos? | `IGameState` |
+| Ejecutar, deshacer y sumar/restar puntos | `MoveCommand` / `MoveHistory` |
+| ¿Se capturó el rey? ¿Quién ganó? | `ChessGame` |
 
-**Precondición de `canMoveTo`:** cuando se llama, ya está garantizado que en `from` está esa pieza, que `from ≠ to` y que en `to` no hay un aliado. Cada pieza **solo** verifica cómo se mueve ella (y si el camino está libre, si le aplica). No repitan los chequeos del `MoveValidator`.
+**Precondición de cada estrategia:** cuando se llama, ya está garantizado que en `from` está esa pieza, que `from ≠ to` y que en `to` no hay un aliado. La estrategia **solo** verifica cómo se mueve (y si el camino está libre, si le aplica). No repitan los chequeos del `MoveValidator`.
 
-**Excepción:** el peón sí mira si el destino está vacío o tiene un enemigo, porque avanza distinto de como captura.
+**Excepción:** `PawnMovement` sí mira si el destino está vacío o tiene un enemigo, porque el peón avanza distinto de como captura.
 
 ---
 
@@ -157,40 +288,41 @@ public final class BoardSetup {
 
 | Integrante | Responsabilidad | Archivos |
 |---|---|---|
-| **A — Bruno** | Validación general, posición inicial, deshacer, integración. Revisa los PR. | `MoveValidator`, `BoardSetup`, `ICommand`, `MoveCommand`, `MoveHistory`, `ChessGame` |
-| **B** | Piezas que se deslizan + camino libre | `Rook`, `Bishop`, `Queen`, `Board.isPathClear` |
-| **C** | Piezas con movimiento particular | `Pawn`, `Knight` |
-| **D** | Rey, turnos y consola | `King`, `IGameState`, `WhiteTurn`, `BlackTurn`, `GameOver`, `ConsoleApp`, `ConsoleRenderer`, `NotationParser` |
+| **A — Bruno** | Núcleo, integración, diagrama. Revisa los PR. | ✅ `Piece` + `MovementStrategy`, `PieceType`, `ScoreBoard`, puntaje en comandos, `ChessGame`. Pendiente: `BoardSetup`, diagrama de clases |
+| **B — Gonzalo** | Piezas que se deslizan + camino libre | ✅ `isPathClear`. Pendiente: migrar torre/alfil/reina a `StraightMovement`, `DiagonalMovement`, `CombinedMovement` + `Pieces.rook/bishop/queen` + sus tests |
+| **C — Guido** | Caballo y peón | ✅ lógica de `Knight` y `Pawn` con tests (PR #4). Pendiente: migrar a `KnightMovement`, `PawnMovement` + `Pieces.knight/pawn` |
+| **D — Mateo** | Rey, turnos, consola y ventana | ✅ `King`, los 3 estados y la consola con tests (PR #2). Pendiente: migrar a `KingMovement` + `Pieces.king`, límite de turnos en los estados, ajustar `ConsoleApp` al constructor nuevo, y la ventana Swing (`SwingApp`, `ChessWindow`, `PieceSymbols`) |
 
-Cada uno escribe **los tests de sus propias clases**.
+Mateo quedó cargado: si Gonzalo o Guido terminan antes, alguno puede tomar la ventana Swing. Lo acuerdan entre ustedes.
+
+Cada uno escribe **los tests de sus propias clases** (la ventana Swing no se testea).
 
 ### Orden
 
-1. **Hecho (A):** `MoveValidator`, `ICommand`, `MoveCommand`, `MoveHistory`, `IGameState`, `IGameService`, `MoveResult`, `ChessGame`, con sus tests.
-2. **En paralelo, desde ya:** todas las piezas (B, C, D), los estados y `NotationParser` (D). Nadie depende de nadie.
+1. **Hecho:** todo lo marcado ✅ arriba.
+2. **En paralelo, desde ya:** cada uno migra su parte a estrategias. Nadie depende de nadie.
+   - **Gonzalo:** rama nueva desde `main` (su PR #3 ya está mergeado).
+   - **Guido y Mateo:** **sobre su misma rama**, así el PR abierto (#4 y #2) se actualiza solo. Primero traen `main` (`git merge main`), después migran, sacan `.idea/` del PR y suben.
 3. **Cuando las 6 piezas estén en `main` (A):** `BoardSetup.standard()`.
-4. **Consola (D):** `ConsoleApp` arma todo y juega.
-
-### Decisión pendiente del equipo
-
-Sin jaque mate, **¿cuándo termina la partida?** Propuesta: cuando se captura un rey. Hay que acordarlo antes de que D implemente `GameOver`.
+4. **Ventana (Mateo, o quien la tome):** puede arrancar ya con un tablero armado a mano (con las piezas que ya estén en `Pieces`) y cambiar a `BoardSetup.standard()` cuando exista.
+5. **Al final (A, con revisión de todos):** diagrama de clases UML.
 
 ---
 
 ## 6. Reglas de código
 
 - **Nombres en inglés** (clases, métodos, variables). Los comentarios pueden ir en español.
-- **Inyección por constructor.** Una clase recibe sus dependencias en el constructor; no las crea adentro con `new`. (Crear objetos de dominio como `Position` o una pieza está bien; lo que no se hace es crear adentro un servicio del que la clase depende.) El único lugar que arma todo con `new` es `ConsoleApp.main`.
-- **Comparar objetos con `.equals()`, nunca con `==`.** Excepción: enums (`Color.WHITE == color` está bien) y chequeos contra `null`.
-- **Herencia solo para las piezas.** Todo lo demás, composición.
-- **Patrones elegidos:** State (turnos) y Command (deshacer). No agreguen otros (Observer, Factory, Strategy…) sin justificarlo en el grupo. La pregunta antes de cualquier abstracción nueva: **"¿este problema existe hoy?"** Si no, no va.
-- **Cero lógica de dibujo en el núcleo.** Símbolos, colores de consola, texto: todo en `adapters/console`.
+- **Inyección por constructor.** Una clase recibe sus dependencias en el constructor; no las crea adentro con `new`. (Crear objetos de dominio como `Position` o una pieza está bien.) El único lugar que arma todo es `SwingApp.main`.
+- **Comparar objetos con `.equals()`, nunca con `==`.** Excepción: enums (`Color.WHITE == color`, `type == PieceType.KING`) y chequeos contra `null`.
+- 🆕 **Sin herencia de piezas.** `Piece` es `final`. Una pieza nueva = una `MovementStrategy` nueva + su método en `Pieces`. Para todo lo demás, composición.
+- 🆕 **Patrones elegidos:** Strategy (movimientos), State (turnos y fin de partida) y Command (deshacer). No agreguen otros (Observer, Factory…) sin justificarlo en el grupo. La pregunta antes de cualquier abstracción nueva: **"¿este problema existe hoy?"** Si no, no va.
+- **Cero lógica de dibujo en el núcleo.** Símbolos, colores, textos de la ventana: todo en `adapters/swing`.
 
 ---
 
 ## 7. Reglas de tests
 
-- JUnit 5. El test va en el **mismo paquete** que la clase, bajo `src/test/java`. Ejemplo: `Rook` → `src/test/java/chess/core/model/RookTest.java`.
+- JUnit 5. El test va en el **mismo paquete** que la clase, bajo `src/test/java`. Ejemplo: `KnightMovement` → `src/test/java/chess/core/movement/KnightMovementTest.java`.
 - **Estructura AAA obligatoria**, con los tres comentarios y lo que se espera:
 
 ```java
@@ -198,9 +330,9 @@ Sin jaque mate, **¿cuándo termina la partida?** Propuesta: cuando se captura u
 void rookCannotJumpOverPieces() {
     // Arrange
     Board board = new Board();
-    Rook rook = new Rook(Color.WHITE);
+    Piece rook = Pieces.rook(Color.WHITE);
     board.setPiece(new Position(0, 0), rook);
-    board.setPiece(new Position(2, 0), new StubPiece(Color.WHITE, false));   // algo en el camino
+    board.setPiece(new Position(2, 0), StubMovement.piece(Color.WHITE, false));   // algo en el camino
 
     // Act
     boolean result = rook.canMoveTo(new Position(0, 0), new Position(5, 0), board);
@@ -210,25 +342,26 @@ void rookCannotJumpOverPieces() {
 }
 ```
 
-- **Sin infraestructura:** se arma un `Board` vacío y se ponen solo las piezas que el caso necesita. Nunca se testea a través de la consola.
+- **Sin infraestructura:** se arma un `Board` vacío y se ponen solo las piezas que el caso necesita. Nunca se testea a través de la ventana.
 - **Dobles de prueba disponibles** en `src/test/java/chess/doubles/`:
-  - `StubPiece(color, canMove)` — pieza que siempre responde lo mismo. Sirve para poner "algo" en el camino o de enemigo sin depender de las piezas de otro.
-  - `FakeTurnState(color)` — alterna turnos de verdad, versión simplificada de los estados.
+  - 🆕 `StubMovement(canMove)` — estrategia que siempre responde lo mismo. Atajos: `StubMovement.piece(color, canMove)` y `StubMovement.piece(color, PieceType.X, canMove)` para poner "algo" en el camino, un enemigo, o una pieza de cierto valor (tests de puntaje / rey).
+  - `FakeTurnState(color)` y `FakeTurnState(color, over)` — alterna turnos de verdad; con `over = true` simula que se acabaron los turnos.
   - `MockCommand` — cuenta cuántas veces se llamó `execute()` y `undo()`.
-- **Mínimo por pieza:** un movimiento válido, uno geométricamente inválido, uno bloqueado (si aplica) y una captura.
+- **Mínimo por estrategia:** un movimiento válido, uno geométricamente inválido, uno bloqueado (si aplica) y una captura. El peón, además: doble paso solo la primera vez, no captura hacia adelante, no avanza en diagonal sin enemigo, y las negras van para el otro lado.
+- **Mínimo para los estados:** el turno pasa de blancas a negras y vuelve; con `maxTurns = 1`, después de blancas + negras queda `GameOverState`; en `GameOverState` nadie puede mover.
 - Los nombres de los tests dicen qué verifican: `pawnCanMoveTwoSquaresOnFirstMove`, no `test1`.
-- **`mvn test` en verde antes de abrir un PR.** Sin excepciones.
+- **`mvn test` en verde antes de abrir un PR** (o "Run Tests" en VS Code). Sin excepciones.
 
 ---
 
 ## 8. Git
 
 - **Nunca push directo a `main`.**
-- Una rama por tarea: `feature/rook`, `feature/move-command`, `feature/console`…
+- Una rama por tarea: `feature/knight`, `feature/pawn`, `feature/swing`…
 - Terminaste → push de tu rama → **Pull Request** a `main` → A (u otro) lo revisa → merge.
 - Antes de empezar cada día: `git checkout main` + `git pull`, y después volvé a tu rama y traé los cambios (`git merge main`).
-- Commits chicos, mensaje corto que diga qué hiciste: `"Rook: movimiento y tests"`.
-- **No se sube `target/`** (ya está en el `.gitignore`).
+- Commits chicos, mensaje corto que diga qué hiciste: `"KnightMovement: movimiento y tests"`.
+- **No se sube `target/` ni `.idea/`** (ya están en el `.gitignore`).
 
 ---
 

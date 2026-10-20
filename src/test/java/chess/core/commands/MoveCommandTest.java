@@ -4,7 +4,9 @@ import chess.core.model.Board;
 import chess.core.model.Color;
 import chess.core.model.Piece;
 import chess.core.model.Position;
-import chess.doubles.StubPiece;
+import chess.core.model.PieceType;
+import chess.core.model.ScoreBoard;
+import chess.doubles.StubMovement;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -24,9 +26,9 @@ class MoveCommandTest {
     void executeMovesPieceAndEmptiesOrigin() {
         // Arrange
         Board board = new Board();
-        Piece piece = new StubPiece(Color.WHITE, true);
+        Piece piece = StubMovement.piece(Color.WHITE, true);
         board.setPiece(new Position(1, 4), piece);
-        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4));
+        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4), new ScoreBoard());
 
         // Act
         command.execute();
@@ -40,9 +42,9 @@ class MoveCommandTest {
     void executeMarksPieceAsMoved() {
         // Arrange
         Board board = new Board();
-        Piece piece = new StubPiece(Color.WHITE, true);
+        Piece piece = StubMovement.piece(Color.WHITE, true);
         board.setPiece(new Position(1, 4), piece);
-        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4));
+        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4), new ScoreBoard());
 
         // Act
         command.execute();
@@ -55,10 +57,10 @@ class MoveCommandTest {
     void undoRestoresBoardAfterCapture() {
         // Arrange
         Board board = new Board();
-        board.setPiece(new Position(3, 3), new StubPiece(Color.WHITE, true));
-        board.setPiece(new Position(4, 4), new StubPiece(Color.BLACK, true));   // hay captura
+        board.setPiece(new Position(3, 3), StubMovement.piece(Color.WHITE, true));
+        board.setPiece(new Position(4, 4), StubMovement.piece(Color.BLACK, true));   // hay captura
         Map<Position, Piece> before = snapshot(board);
-        MoveCommand command = new MoveCommand(board, new Position(3, 3), new Position(4, 4));
+        MoveCommand command = new MoveCommand(board, new Position(3, 3), new Position(4, 4), new ScoreBoard());
 
         // Act
         command.execute();
@@ -74,9 +76,9 @@ class MoveCommandTest {
     void undoOfFirstMoveResetsMovedFlag() {
         // Arrange
         Board board = new Board();
-        Piece piece = new StubPiece(Color.WHITE, true);
+        Piece piece = StubMovement.piece(Color.WHITE, true);
         board.setPiece(new Position(1, 4), piece);
-        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4));
+        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4), new ScoreBoard());
 
         // Act
         command.execute();
@@ -90,10 +92,10 @@ class MoveCommandTest {
     void undoOfLaterMoveKeepsMovedFlag() {
         // Arrange — la pieza ya se movió antes (a1 -> a4), ahora va de a4 a a7
         Board board = new Board();
-        Piece piece = new StubPiece(Color.WHITE, true);
+        Piece piece = StubMovement.piece(Color.WHITE, true);
         board.setPiece(new Position(0, 0), piece);
-        new MoveCommand(board, new Position(0, 0), new Position(3, 0)).execute();
-        MoveCommand second = new MoveCommand(board, new Position(3, 0), new Position(6, 0));
+        new MoveCommand(board, new Position(0, 0), new Position(3, 0), new ScoreBoard()).execute();
+        MoveCommand second = new MoveCommand(board, new Position(3, 0), new Position(6, 0), new ScoreBoard());
 
         // Act
         second.execute();
@@ -108,10 +110,60 @@ class MoveCommandTest {
     void undoBeforeExecuteFails() {
         // Arrange
         Board board = new Board();
-        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4));
+        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4), new ScoreBoard());
 
         // Act + Assert — espero una excepción: no hay nada que deshacer
         assertThrows(IllegalStateException.class, command::undo);
+    }
+
+    @Test
+    void captureAddsValueOfCapturedPieceToMover() {
+        // Arrange
+        Board board = new Board();
+        ScoreBoard score = new ScoreBoard();
+        board.setPiece(new Position(0, 0), StubMovement.piece(Color.WHITE, true));
+        board.setPiece(new Position(0, 7), StubMovement.piece(Color.BLACK, PieceType.ROOK, true));
+        MoveCommand command = new MoveCommand(board, new Position(0, 0), new Position(0, 7), score);
+
+        // Act
+        command.execute();
+
+        // Assert — espero 5 puntos para blancas (vale una torre) y 0 para negras
+        assertEquals(5, score.score(Color.WHITE));
+        assertEquals(0, score.score(Color.BLACK));
+    }
+
+    @Test
+    void undoOfCaptureGivesPointsBack() {
+        // Arrange
+        Board board = new Board();
+        ScoreBoard score = new ScoreBoard();
+        board.setPiece(new Position(0, 0), StubMovement.piece(Color.WHITE, true));
+        board.setPiece(new Position(0, 7), StubMovement.piece(Color.BLACK, PieceType.QUEEN, true));
+        MoveCommand command = new MoveCommand(board, new Position(0, 0), new Position(0, 7), score);
+
+        // Act
+        command.execute();
+        command.undo();
+
+        // Assert — espero 0: deshacer la captura también deshace los puntos
+        assertEquals(0, score.score(Color.WHITE));
+    }
+
+    @Test
+    void moveWithoutCaptureDoesNotScore() {
+        // Arrange
+        Board board = new Board();
+        ScoreBoard score = new ScoreBoard();
+        board.setPiece(new Position(1, 4), StubMovement.piece(Color.WHITE, true));
+        MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4), score);
+
+        // Act
+        command.execute();
+
+        // Assert — espero 0 puntos y ninguna pieza capturada
+        assertEquals(0, score.score(Color.WHITE));
+        assertNull(command.capturedPiece());
     }
 
     /**

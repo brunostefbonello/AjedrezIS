@@ -2,8 +2,9 @@ package chess.core.rules;
 
 import chess.core.model.Board;
 import chess.core.model.Color;
+import chess.core.model.Piece;
 import chess.core.model.Position;
-import chess.doubles.StubPiece;
+import chess.doubles.StubMovement;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,7 +31,7 @@ class MoveValidatorTest {
     void rejectsMoveToSameSquare() {
         // Arrange
         Board board = new Board();
-        board.setPiece(new Position(1, 4), new StubPiece(Color.WHITE, true));
+        board.setPiece(new Position(1, 4), StubMovement.piece(Color.WHITE, true));
 
         // Act
         boolean result = validator.isValidMove(board, new Position(1, 4), new Position(1, 4));
@@ -43,8 +44,8 @@ class MoveValidatorTest {
     void rejectsMoveOntoAlly() {
         // Arrange
         Board board = new Board();
-        board.setPiece(new Position(0, 0), new StubPiece(Color.WHITE, true));
-        board.setPiece(new Position(0, 5), new StubPiece(Color.WHITE, true));
+        board.setPiece(new Position(0, 0), StubMovement.piece(Color.WHITE, true));
+        board.setPiece(new Position(0, 5), StubMovement.piece(Color.WHITE, true));
 
         // Act
         boolean result = validator.isValidMove(board, new Position(0, 0), new Position(0, 5));
@@ -57,8 +58,8 @@ class MoveValidatorTest {
     void acceptsCaptureOfEnemyWhenPieceAllowsIt() {
         // Arrange
         Board board = new Board();
-        board.setPiece(new Position(0, 0), new StubPiece(Color.WHITE, true));
-        board.setPiece(new Position(0, 5), new StubPiece(Color.BLACK, true));
+        board.setPiece(new Position(0, 0), StubMovement.piece(Color.WHITE, true));
+        board.setPiece(new Position(0, 5), StubMovement.piece(Color.BLACK, true));
 
         // Act
         boolean result = validator.isValidMove(board, new Position(0, 0), new Position(0, 5));
@@ -71,7 +72,7 @@ class MoveValidatorTest {
     void delegatesToPieceRules() {
         // Arrange
         Board board = new Board();
-        board.setPiece(new Position(0, 0), new StubPiece(Color.WHITE, false));
+        board.setPiece(new Position(0, 0), StubMovement.piece(Color.WHITE, false));
 
         // Act
         boolean result = validator.isValidMove(board, new Position(0, 0), new Position(4, 4));
@@ -84,7 +85,7 @@ class MoveValidatorTest {
     void validatingDoesNotChangeTheBoard() {
         // Arrange
         Board board = new Board();
-        StubPiece piece = new StubPiece(Color.WHITE, true);
+        Piece piece = StubMovement.piece(Color.WHITE, true);
         board.setPiece(new Position(0, 0), piece);
 
         // Act
