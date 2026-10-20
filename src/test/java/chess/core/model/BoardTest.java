@@ -1,6 +1,6 @@
 package chess.core.model;
 
-import chess.doubles.StubPiece;
+import chess.doubles.StubMovement;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,7 +24,7 @@ class BoardTest {
     void pathIsBlockedOnStraightLine() {
         // Arrange
         Board board = new Board();
-        board.setPiece(new Position(0, 3), new StubPiece(Color.BLACK, false));
+        board.setPiece(new Position(0, 3), StubMovement.piece(Color.BLACK, false));
 
         // Act
         boolean result = board.isPathClear(new Position(0, 0), new Position(0, 7));
@@ -49,7 +49,7 @@ class BoardTest {
     void pathIsBlockedOnDiagonal() {
         // Arrange
         Board board = new Board();
-        board.setPiece(new Position(5, 2), new StubPiece(Color.WHITE, false));
+        board.setPiece(new Position(5, 2), StubMovement.piece(Color.WHITE, false));
 
         // Act
         boolean result = board.isPathClear(new Position(7, 0), new Position(3, 4));
@@ -62,8 +62,8 @@ class BoardTest {
     void pathIgnoresPiecesOnOriginAndDestination() {
         // Arrange
         Board board = new Board();
-        board.setPiece(new Position(0, 0), new StubPiece(Color.WHITE, false));
-        board.setPiece(new Position(0, 4), new StubPiece(Color.BLACK, false));
+        board.setPiece(new Position(0, 0), StubMovement.piece(Color.WHITE, false));
+        board.setPiece(new Position(0, 4), StubMovement.piece(Color.BLACK, false));
 
         // Act
         boolean result = board.isPathClear(new Position(0, 0), new Position(0, 4));

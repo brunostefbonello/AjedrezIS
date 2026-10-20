@@ -1,18 +1,24 @@
-package chess.core.model;
+package chess.core.movement;
 
-import chess.doubles.StubPiece;
+import chess.core.model.Board;
+import chess.core.model.Color;
+import chess.core.model.Piece;
+import chess.core.model.Position;
+import chess.core.setup.Pieces;
+import chess.doubles.StubMovement;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RookTest {
+// Casos migrados de RookTest (Gonzalo): misma lógica, ahora como estrategia.
+class StraightMovementTest {
 
     @Test
     void rookCanMoveAlongColumn() {
         // Arrange
         Board board = new Board();
-        Rook rook = new Rook(Color.WHITE);
+        Piece rook = Pieces.rook(Color.WHITE);
         board.setPiece(new Position(0, 0), rook);
 
         // Act
@@ -26,7 +32,7 @@ class RookTest {
     void rookCanMoveAlongRow() {
         // Arrange
         Board board = new Board();
-        Rook rook = new Rook(Color.BLACK);
+        Piece rook = Pieces.rook(Color.BLACK);
         board.setPiece(new Position(7, 7), rook);
 
         // Act
@@ -40,7 +46,7 @@ class RookTest {
     void rookCannotMoveDiagonally() {
         // Arrange
         Board board = new Board();
-        Rook rook = new Rook(Color.WHITE);
+        Piece rook = Pieces.rook(Color.WHITE);
         board.setPiece(new Position(0, 0), rook);
 
         // Act
@@ -54,9 +60,9 @@ class RookTest {
     void rookCannotJumpOverPieces() {
         // Arrange
         Board board = new Board();
-        Rook rook = new Rook(Color.WHITE);
+        Piece rook = Pieces.rook(Color.WHITE);
         board.setPiece(new Position(0, 0), rook);
-        board.setPiece(new Position(2, 0), new StubPiece(Color.WHITE, false));
+        board.setPiece(new Position(2, 0), StubMovement.piece(Color.WHITE, false));
 
         // Act
         boolean result = rook.canMoveTo(new Position(0, 0), new Position(5, 0), board);
@@ -69,9 +75,9 @@ class RookTest {
     void rookCanCaptureEnemy() {
         // Arrange
         Board board = new Board();
-        Rook rook = new Rook(Color.WHITE);
+        Piece rook = Pieces.rook(Color.WHITE);
         board.setPiece(new Position(0, 0), rook);
-        board.setPiece(new Position(0, 6), new StubPiece(Color.BLACK, false));
+        board.setPiece(new Position(0, 6), StubMovement.piece(Color.BLACK, false));
 
         // Act
         boolean result = rook.canMoveTo(new Position(0, 0), new Position(0, 6), board);

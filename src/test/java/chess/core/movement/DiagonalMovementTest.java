@@ -1,18 +1,24 @@
-package chess.core.model;
+package chess.core.movement;
 
-import chess.doubles.StubPiece;
+import chess.core.model.Board;
+import chess.core.model.Color;
+import chess.core.model.Piece;
+import chess.core.model.Position;
+import chess.core.setup.Pieces;
+import chess.doubles.StubMovement;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BishopTest {
+// Casos migrados de BishopTest (Gonzalo): misma lógica, ahora como estrategia.
+class DiagonalMovementTest {
 
     @Test
     void bishopCanMoveDiagonally() {
         // Arrange
         Board board = new Board();
-        Bishop bishop = new Bishop(Color.WHITE);
+        Piece bishop = Pieces.bishop(Color.WHITE);
         board.setPiece(new Position(0, 2), bishop);
 
         // Act
@@ -26,7 +32,7 @@ class BishopTest {
     void bishopCannotMoveInStraightLine() {
         // Arrange
         Board board = new Board();
-        Bishop bishop = new Bishop(Color.WHITE);
+        Piece bishop = Pieces.bishop(Color.WHITE);
         board.setPiece(new Position(0, 2), bishop);
 
         // Act
@@ -40,9 +46,9 @@ class BishopTest {
     void bishopCannotJumpOverPieces() {
         // Arrange
         Board board = new Board();
-        Bishop bishop = new Bishop(Color.BLACK);
+        Piece bishop = Pieces.bishop(Color.BLACK);
         board.setPiece(new Position(7, 5), bishop);
-        board.setPiece(new Position(6, 4), new StubPiece(Color.BLACK, false));
+        board.setPiece(new Position(6, 4), StubMovement.piece(Color.BLACK, false));
 
         // Act
         boolean result = bishop.canMoveTo(new Position(7, 5), new Position(4, 2), board);
@@ -55,9 +61,9 @@ class BishopTest {
     void bishopCanCaptureEnemy() {
         // Arrange
         Board board = new Board();
-        Bishop bishop = new Bishop(Color.BLACK);
+        Piece bishop = Pieces.bishop(Color.BLACK);
         board.setPiece(new Position(7, 5), bishop);
-        board.setPiece(new Position(3, 1), new StubPiece(Color.WHITE, false));
+        board.setPiece(new Position(3, 1), StubMovement.piece(Color.WHITE, false));
 
         // Act
         boolean result = bishop.canMoveTo(new Position(7, 5), new Position(3, 1), board);
