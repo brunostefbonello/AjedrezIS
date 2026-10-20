@@ -1,4 +1,10 @@
-package chess.core.model;
+package chess.core.movement;
+
+import chess.core.model.Board;
+import chess.core.model.Color;
+import chess.core.model.MovementStrategy;
+import chess.core.model.Piece;
+import chess.core.model.Position;
 
 /**
  * Peón: avanza distinto de como captura.
@@ -9,47 +15,45 @@ package chess.core.model;
  * Las blancas avanzan sumando row; las negras, restando.
  * No incluye captura al paso ni promoción (fuera de alcance por ahora).
  *
- * Precondición (la garantiza MoveValidator): en {@code from} está esta pieza,
+ * Precondición (la garantiza MoveValidator): en {@code from} está la pieza,
  * from != to y en {@code to} no hay un aliado. A diferencia del resto de las piezas,
  * el peón sí mira el destino porque su avance y su captura son distintos.
  */
-public class Pawn extends Piece {
-
-    public Pawn(Color color) {
-        super(color);
-    }
+public class PawnMovement implements MovementStrategy {
 
     @Override
-    public boolean canMoveTo(Position from, Position to, Board board) {
-        int direction = (color() == Color.WHITE) ? 1 : -1;
+    public boolean canMove(Piece piece, Position from, Position to, Board board) {
+        int direction = (piece.color() == Color.WHITE) ? 1 : -1;
         int rowDelta = to.row() - from.row();
         int colDelta = to.col() - from.col();
 
         if (colDelta == 0) {
-            return canAdvance(from, to, board, direction, rowDelta);
+            return canAdvance(piece, from, to, board, direction, rowDelta);
         }
-        return canCapture(to, board, direction, rowDelta, colDelta);
+        return canCapture(piece, to, board, direction, rowDelta, colDelta);
     }
 
-    private boolean canAdvance(Position from, Position to, Board board, int direction, int rowDelta) {
+    private boolean canAdvance(Piece piece, Position from, Position to, Board board,
+                               int direction, int rowDelta) {
         if (!board.isEmpty(to)) {
             return false;                           // avanzando no se captura: el destino debe estar vacío
         }
         if (rowDelta == direction) {
             return true;                            // una casilla
         }
-        if (rowDelta == 2 * direction && !hasMoved()) {
+        if (rowDelta == 2 * direction && !piece.hasMoved()) {
             Position between = new Position(from.row() + direction, from.col());
             return board.isEmpty(between);          // dos casillas: la del medio también debe estar libre
         }
         return false;
     }
 
-    private boolean canCapture(Position to, Board board, int direction, int rowDelta, int colDelta) {
+    private boolean canCapture(Piece piece, Position to, Board board,
+                               int direction, int rowDelta, int colDelta) {
         if (rowDelta != direction || Math.abs(colDelta) != 1) {
             return false;                           // la captura es una diagonal hacia adelante
         }
         Piece target = board.getPiece(to);
-        return target != null && !isAlly(target);   // tiene que haber un enemigo
+        return target != null && !piece.isAlly(target);   // tiene que haber un enemigo
     }
 }

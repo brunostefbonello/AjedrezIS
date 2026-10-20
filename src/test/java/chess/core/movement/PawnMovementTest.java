@@ -1,12 +1,17 @@
-package chess.core.model;
+package chess.core.movement;
 
-import chess.doubles.StubPiece;
+import chess.core.model.Board;
+import chess.core.model.Color;
+import chess.core.model.Piece;
+import chess.core.model.Position;
+import chess.core.setup.Pieces;
+import chess.doubles.StubMovement;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PawnTest {
+class PawnMovementTest {
 
     private static final Position E2 = new Position(1, 4);
     private static final Position E7 = new Position(6, 4);
@@ -17,7 +22,7 @@ class PawnTest {
     void whitePawnCanMoveOneSquareForward() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
 
         // Act
@@ -31,7 +36,7 @@ class PawnTest {
     void pawnCanMoveTwoSquaresOnFirstMove() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
 
         // Act
@@ -45,7 +50,7 @@ class PawnTest {
     void pawnCannotMoveTwoSquaresAfterItHasMoved() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         pawn.markAsMoved();
         board.setPiece(E2, pawn);
 
@@ -60,7 +65,7 @@ class PawnTest {
     void pawnCannotMoveThreeSquares() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
 
         // Act
@@ -74,7 +79,7 @@ class PawnTest {
     void whitePawnCannotMoveBackwards() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         Position from = new Position(3, 4);
         board.setPiece(from, pawn);
 
@@ -89,7 +94,7 @@ class PawnTest {
     void pawnCannotMoveSideways() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
 
         // Act
@@ -105,9 +110,9 @@ class PawnTest {
     void pawnCannotAdvanceOntoEnemyInFront() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
-        board.setPiece(new Position(2, 4), new StubPiece(Color.BLACK, false));   // enemigo justo adelante
+        board.setPiece(new Position(2, 4), StubMovement.piece(Color.BLACK, false));   // enemigo justo adelante
 
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(2, 4), board);
@@ -120,9 +125,9 @@ class PawnTest {
     void pawnCannotJumpOverPieceOnFirstMove() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
-        board.setPiece(new Position(2, 4), new StubPiece(Color.BLACK, false));   // algo en e3, el destino e4 está vacío
+        board.setPiece(new Position(2, 4), StubMovement.piece(Color.BLACK, false));   // algo en e3, el destino e4 está vacío
 
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(3, 4), board);
@@ -135,9 +140,9 @@ class PawnTest {
     void pawnCannotAdvanceTwoOntoOccupiedSquare() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
-        board.setPiece(new Position(3, 4), new StubPiece(Color.BLACK, false));   // enemigo en e4, e3 vacía
+        board.setPiece(new Position(3, 4), StubMovement.piece(Color.BLACK, false));   // enemigo en e4, e3 vacía
 
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(3, 4), board);
@@ -152,9 +157,9 @@ class PawnTest {
     void whitePawnCanCaptureEnemyDiagonally() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
-        board.setPiece(new Position(2, 5), new StubPiece(Color.BLACK, false));   // enemigo en f3
+        board.setPiece(new Position(2, 5), StubMovement.piece(Color.BLACK, false));   // enemigo en f3
 
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(2, 5), board);
@@ -167,9 +172,9 @@ class PawnTest {
     void pawnCanCaptureDiagonallyToTheLeft() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
-        board.setPiece(new Position(2, 3), new StubPiece(Color.BLACK, false));   // enemigo en d3
+        board.setPiece(new Position(2, 3), StubMovement.piece(Color.BLACK, false));   // enemigo en d3
 
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(2, 3), board);
@@ -182,7 +187,7 @@ class PawnTest {
     void pawnCannotMoveDiagonallyToEmptySquare() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
 
         // Act
@@ -196,10 +201,10 @@ class PawnTest {
     void pawnCannotCaptureBackwards() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.WHITE);
+        Piece pawn = Pieces.pawn(Color.WHITE);
         Position from = new Position(3, 4);
         board.setPiece(from, pawn);
-        board.setPiece(new Position(2, 5), new StubPiece(Color.BLACK, false));   // enemigo detrás en diagonal
+        board.setPiece(new Position(2, 5), StubMovement.piece(Color.BLACK, false));   // enemigo detrás en diagonal
 
         // Act
         boolean result = pawn.canMoveTo(from, new Position(2, 5), board);
@@ -214,7 +219,7 @@ class PawnTest {
     void blackPawnCanMoveOneSquareForward() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.BLACK);
+        Piece pawn = Pieces.pawn(Color.BLACK);
         board.setPiece(E7, pawn);
 
         // Act
@@ -228,7 +233,7 @@ class PawnTest {
     void blackPawnCanMoveTwoSquaresOnFirstMove() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.BLACK);
+        Piece pawn = Pieces.pawn(Color.BLACK);
         board.setPiece(E7, pawn);
 
         // Act
@@ -242,7 +247,7 @@ class PawnTest {
     void blackPawnCannotMoveBackwards() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.BLACK);
+        Piece pawn = Pieces.pawn(Color.BLACK);
         Position from = new Position(4, 4);
         board.setPiece(from, pawn);
 
@@ -257,9 +262,9 @@ class PawnTest {
     void blackPawnCanCaptureEnemyDiagonally() {
         // Arrange
         Board board = new Board();
-        Pawn pawn = new Pawn(Color.BLACK);
+        Piece pawn = Pieces.pawn(Color.BLACK);
         board.setPiece(E7, pawn);
-        board.setPiece(new Position(5, 3), new StubPiece(Color.WHITE, false));   // enemigo en d6
+        board.setPiece(new Position(5, 3), StubMovement.piece(Color.WHITE, false));   // enemigo en d6
 
         // Act
         boolean result = pawn.canMoveTo(E7, new Position(5, 3), board);
@@ -268,5 +273,3 @@ class PawnTest {
         assertTrue(result);
     }
 }
-
-
