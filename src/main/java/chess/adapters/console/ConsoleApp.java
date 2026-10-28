@@ -4,12 +4,14 @@ import chess.core.game.ChessGame;
 import chess.core.model.Board;
 //import chess.core.model.BoardSetup;
 import chess.core.model.Color;
-import chess.core.model.King;
 import chess.core.model.Position;
+import chess.core.model.ScoreBoard;
 import chess.core.ports.IGameService;
 import chess.core.ports.MoveResult;
 import chess.core.rules.MoveValidator;
 import chess.core.commands.MoveHistory;
+import chess.core.setup.Pieces;
+import chess.core.state.IGameState;
 import chess.core.state.WhiteTurnState; // o WhiteTurnState según tu repo
 
 import java.util.Scanner;
@@ -20,16 +22,18 @@ public class ConsoleApp {
         // Ensamble de dependencias (único lugar permitido con new)
        Board board = new Board(); //instanciacion del tablero
 
-        /*automatizar instanciacion de piezas en el board
 
-        board.setPiece(new Position(0, 4), new King(Color.WHITE)); // Rey blanco en e1
-    board.setPiece(new Position(7, 4), new King(Color.BLACK)); // Rey negro en e8
-    board.setPiece(new Position(1, 4), new King(Color.BLACK));
-         */
+
+        board.setPiece(new Position(0, 4), Pieces.king(Color.WHITE));
+        board.setPiece(new Position(7, 4), Pieces.king(Color.BLACK));
+
 
         MoveValidator validator = new MoveValidator();
         MoveHistory history = new MoveHistory();
-        IGameService game = new ChessGame(board, validator, history, new WhiteTurnState());
+
+        ScoreBoard scoreboard = new ScoreBoard();
+        IGameState initialState = new WhiteTurnState(1,30);
+        IGameService game = new ChessGame(board, validator, history, scoreboard, initialState);
 
         ConsoleRenderer renderer = new ConsoleRenderer();
         NotationParser parser = new NotationParser();
@@ -40,7 +44,6 @@ public class ConsoleApp {
 
         while (!game.isOver()) {
             renderer.render(game);
-            System.out.println("Turno: " + game.currentTurn());
             System.out.print("Jugada > ");
             String input = scanner.nextLine().trim();
 

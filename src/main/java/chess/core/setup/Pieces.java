@@ -3,6 +3,7 @@ package chess.core.setup;
 import chess.core.model.Color;
 import chess.core.model.Piece;
 import chess.core.model.PieceType;
+import chess.core.movement.KingMovement;
 import chess.core.movement.KnightMovement;
 import chess.core.movement.PawnMovement;
 
@@ -30,5 +31,9 @@ public final class Pieces {
 
     public static Piece pawn(Color color) {
         return new Piece(color, PieceType.PAWN, new PawnMovement());
+    }
+
+    public static Piece king(Color color) {
+        return new Piece(color, PieceType.KING, new KingMovement());
     }
 }
