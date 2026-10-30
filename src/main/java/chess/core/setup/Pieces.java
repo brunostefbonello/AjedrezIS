@@ -20,7 +20,6 @@ import chess.core.movement.StraightMovement;
  *         return new Piece(color, PieceType.ROOK, new StraightMovement());
  *     }
  *
- * Pendiente: king() (Integrante D).
  */
 public final class Pieces {
 
