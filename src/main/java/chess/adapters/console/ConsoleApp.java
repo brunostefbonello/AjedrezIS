@@ -1,39 +1,33 @@
 package chess.adapters.console;
 
+import chess.core.commands.MoveHistory;
 import chess.core.game.ChessGame;
-import chess.core.model.Board;
-//import chess.core.model.BoardSetup;
-import chess.core.model.Color;
 import chess.core.model.Position;
 import chess.core.model.ScoreBoard;
 import chess.core.ports.IGameService;
 import chess.core.ports.MoveResult;
 import chess.core.rules.MoveValidator;
-import chess.core.commands.MoveHistory;
-import chess.core.setup.Pieces;
-import chess.core.state.IGameState;
-import chess.core.state.WhiteTurnState; // o WhiteTurnState según tu repo
+import chess.core.setup.BoardSetup;
+import chess.core.state.WhiteTurnState;
 
 import java.util.Scanner;
 
+/**
+ * Segundo adaptador: la misma partida que la ventana, jugada por consola.
+ * Usa el mismo núcleo sin cambiarlo (demostración de arquitectura hexagonal).
+ */
 public class ConsoleApp {
 
+    private static final int MAX_TURNS = 30;
+
     public static void main(String[] args) {
-        // Ensamble de dependencias (único lugar permitido con new)
-       Board board = new Board(); //instanciacion del tablero
-
-
-
-        board.setPiece(new Position(0, 4), Pieces.king(Color.WHITE));
-        board.setPiece(new Position(7, 4), Pieces.king(Color.BLACK));
-
-
-        MoveValidator validator = new MoveValidator();
-        MoveHistory history = new MoveHistory();
-
-        ScoreBoard scoreboard = new ScoreBoard();
-        IGameState initialState = new WhiteTurnState(1,30);
-        IGameService game = new ChessGame(board, validator, history, scoreboard, initialState);
+        // Ensamble de dependencias: el mismo que SwingApp
+        IGameService game = new ChessGame(
+                BoardSetup.standard(),
+                new MoveValidator(),
+                new MoveHistory(),
+                new ScoreBoard(),
+                new WhiteTurnState(1, MAX_TURNS));
 
         ConsoleRenderer renderer = new ConsoleRenderer();
         NotationParser parser = new NotationParser();
@@ -45,6 +39,9 @@ public class ConsoleApp {
         while (!game.isOver()) {
             renderer.render(game);
             System.out.print("Jugada > ");
+            if (!scanner.hasNextLine()) {
+                break;                                  // se cerró la entrada
+            }
             String input = scanner.nextLine().trim();
 
             if (input.equalsIgnoreCase("undo")) {
@@ -72,12 +69,21 @@ public class ConsoleApp {
 
             MoveResult result = game.move(from, to);
             if (result != MoveResult.OK) {
-                System.out.println("Movimiento rechazado: " + result);
+                System.out.println(messageFor(result));
             }
         }
 
         renderer.render(game);
         System.out.println("¡Fin de la partida!");
         scanner.close();
+    }
+
+    private static String messageFor(MoveResult result) {
+        return switch (result) {
+            case OK -> "";
+            case INVALID_MOVE -> "Movimiento inválido.";
+            case NOT_YOUR_TURN -> "No es tu turno.";
+            case GAME_OVER -> "La partida ya terminó.";
+        };
     }
 }
