@@ -15,7 +15,7 @@ public class ChessWindow extends JFrame {
     private final JButton[][] squares = new JButton[8][8];
     private final JLabel statusLabel = new JLabel("Iniciando partida...", SwingConstants.CENTER);
     private final JLabel scoreLabel = new JLabel("Puntos - Blancas: 0 | Negras: 0", SwingConstants.CENTER);
-    private final JButton undoBtn = new JButton("Deshacer Jugada"); // 🆕 NUEVO
+    private final JButton undoBtn = new JButton("Deshacer jugada");
     private Position selectedPosition = null;
 
     // Paleta de colores sobrios
@@ -140,21 +140,56 @@ public class ChessWindow extends JFrame {
         int row = 7 - visualRow;
         Position clickedPos = new Position(row, col);
 
+        Piece clickedPiece = game.pieceAt(clickedPos);
+
         if (selectedPosition == null) {
-            if (game.pieceAt(clickedPos) != null) {
-                selectedPosition = clickedPos;
-                squares[visualRow][col].setBackground(colorSeleccion);
+            if (clickedPiece != null) {
+                select(visualRow, col, clickedPos);
             }
-        } else {
-            MoveResult result = game.move(selectedPosition, clickedPos);
+            return;
+        }
+
+        if (clickedPos.equals(selectedPosition)) {
+            // Clic de nuevo sobre la misma pieza: se deselecciona
             selectedPosition = null;
             refreshBoard();
-
-            if (result != MoveResult.OK) {
-                // Alerta más prolija nativa de Swing
-                JOptionPane.showMessageDialog(this, "Movimiento inválido: " + result, "Aviso", JOptionPane.WARNING_MESSAGE);
-            }
+            return;
         }
+
+        Piece selectedPiece = game.pieceAt(selectedPosition);
+        if (clickedPiece != null && clickedPiece.isAlly(selectedPiece)) {
+            // Clic sobre otra pieza propia: cambia la selección en vez de intentar moverse
+            refreshBoard();
+            select(visualRow, col, clickedPos);
+            return;
+        }
+
+        MoveResult result = game.move(selectedPosition, clickedPos);
+        selectedPosition = null;
+        refreshBoard();
+
+        if (result != MoveResult.OK) {
+            JOptionPane.showMessageDialog(this, messageFor(result), "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void select(int visualRow, int col, Position position) {
+        selectedPosition = position;
+        squares[visualRow][col].setBackground(colorSeleccion);
+    }
+
+    // Textos de la ventana: viven en el adaptador, el núcleo solo devuelve enums.
+    private static String messageFor(MoveResult result) {
+        return switch (result) {
+            case OK -> "";
+            case INVALID_MOVE -> "Movimiento inválido.";
+            case NOT_YOUR_TURN -> "No es tu turno.";
+            case GAME_OVER -> "La partida ya terminó.";
+        };
+    }
+
+    private static String nameOf(Color color) {
+        return color == Color.WHITE ? "Blancas" : "Negras";
     }
 
     private void undo() {
@@ -176,20 +211,22 @@ public class ChessWindow extends JFrame {
                 Piece piece = game.pieceAt(new Position(row, col));
                 squares[visualRow][col].setText(PieceSymbols.get(piece));
 
-                if (piece != null) {
-                    squares[visualRow][col].setForeground(piece.color() == Color.WHITE ? java.awt.Color.WHITE : java.awt.Color.BLACK);
-                }
+                // Todas en negro: el símbolo ya distingue el color (♔ hueco = blancas, ♚ relleno = negras).
+                // Pintarlas en blanco las hacía invisibles sobre las casillas claras.
+                squares[visualRow][col].setForeground(java.awt.Color.BLACK);
             }
         }
 
-        scoreLabel.setText("Puntos -> BLANCAS: " + game.score(Color.WHITE) + " | NEGRAS: " + game.score(Color.BLACK));
+        scoreLabel.setText("Puntos: Blancas " + game.score(Color.WHITE) + " | Negras " + game.score(Color.BLACK));
 
         if (game.isOver()) {
             Color winner = game.winner();
-            statusLabel.setText(winner != null ? "¡PARTIDA TERMINADA! Ganó " + winner : "¡PARTIDA TERMINADA! Empate.");
+            statusLabel.setText(winner != null
+                    ? "¡Partida terminada! Ganan las " + nameOf(winner)
+                    : "¡Partida terminada! Empate");
             undoBtn.setEnabled(false);
         } else {
-            statusLabel.setText("Turno activo: " + game.currentTurn());
+            statusLabel.setText("Turno de las " + nameOf(game.currentTurn()));
             undoBtn.setEnabled(true);
         }
     }

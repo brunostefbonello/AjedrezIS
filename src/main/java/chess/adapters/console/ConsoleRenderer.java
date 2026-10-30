@@ -25,38 +25,39 @@ public class ConsoleRenderer {
         }
         System.out.println("    a   b   c   d   e   f   g   h\n");
 
-        // 🆕 Agregados del convenio v2: Puntaje, Turno y Ganador
-        System.out.println("Puntaje -> BLANCAS: " + game.score(Color.WHITE) + " | NEGRAS: " + game.score(Color.BLACK));
+        System.out.println("Puntos: Blancas " + game.score(Color.WHITE) + " | Negras " + game.score(Color.BLACK));
 
         if (game.isOver()) {
             Color winner = game.winner();
             if (winner != null) {
-                System.out.println("¡PARTIDA TERMINADA! Ganador: " + winner);
+                System.out.println("¡Partida terminada! Ganan las " + nameOf(winner));
             } else {
-                System.out.println("¡PARTIDA TERMINADA! Es un empate por límite de turnos.");
+                System.out.println("¡Partida terminada! Empate por límite de turnos.");
             }
         } else {
-            System.out.println("Turno activo: " + game.currentTurn());
+            System.out.println("Turno de las " + nameOf(game.currentTurn()));
         }
     }
 
+    // Mayúscula = blancas, minúscula = negras (notación inglesa: N = caballo)
     private String getPieceSymbol(Piece piece) {
         if (piece == null) {
             return " ";
         }
-        String name = piece.type().name(); // Ahora usa piece.type() por el nuevo convenio
-        char letter = switch (name) {
-            case "KING" -> 'K';
-            case "QUEEN" -> 'Q';
-            case "ROOK" -> 'R';
-            case "BISHOP" -> 'B';
-            case "KNIGHT" -> 'N';
-            case "PAWN" -> 'P';
-            default -> '?';
+        char letter = switch (piece.type()) {
+            case KING -> 'K';
+            case QUEEN -> 'Q';
+            case ROOK -> 'R';
+            case BISHOP -> 'B';
+            case KNIGHT -> 'N';
+            case PAWN -> 'P';
         };
-
         return piece.color() == Color.WHITE
-                ? String.valueOf(letter).toUpperCase()
-                : String.valueOf(letter).toLowerCase();
+                ? String.valueOf(letter)
+                : String.valueOf(Character.toLowerCase(letter));
+    }
+
+    private String nameOf(Color color) {
+        return color == Color.WHITE ? "Blancas" : "Negras";
     }
 }
