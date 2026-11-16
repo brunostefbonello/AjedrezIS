@@ -16,7 +16,7 @@ class BoardTest {
         // Act
         boolean result = board.isPathClear(new Position(0, 0), new Position(7, 0));
 
-        // Assert — espero true: no hay nada entre a1 y a8
+        // Assert: true, nada entre a1 y a8
         assertTrue(result);
     }
 
@@ -29,7 +29,7 @@ class BoardTest {
         // Act
         boolean result = board.isPathClear(new Position(0, 0), new Position(0, 7));
 
-        // Assert — espero false: hay una pieza en d1, entre a1 y h1
+        // Assert: false, pieza en d1
         assertFalse(result);
     }
 
@@ -41,7 +41,7 @@ class BoardTest {
         // Act
         boolean result = board.isPathClear(new Position(7, 7), new Position(0, 0));
 
-        // Assert — espero true: la diagonal h8-a1 está vacía
+        // Assert: true, diagonal h8-a1 vacía
         assertTrue(result);
     }
 
@@ -54,7 +54,7 @@ class BoardTest {
         // Act
         boolean result = board.isPathClear(new Position(7, 0), new Position(3, 4));
 
-        // Assert — espero false: hay una pieza en c6, sobre la diagonal a8-e4
+        // Assert: false, pieza en c6
         assertFalse(result);
     }
 
@@ -68,7 +68,7 @@ class BoardTest {
         // Act
         boolean result = board.isPathClear(new Position(0, 0), new Position(0, 4));
 
-        // Assert — espero true: solo se miran las casillas estrictamente entre from y to
+        // Assert: true, solo mira casillas intermedias
         assertTrue(result);
     }
 
@@ -80,7 +80,7 @@ class BoardTest {
         // Act
         boolean result = board.isPathClear(new Position(3, 3), new Position(4, 4));
 
-        // Assert — espero true: no hay casillas intermedias
+        // Assert: true, sin casillas intermedias
         assertTrue(result);
     }
 
@@ -92,7 +92,7 @@ class BoardTest {
         // Act
         boolean result = board.isPathClear(new Position(0, 1), new Position(2, 2));
 
-        // Assert — espero false: un salto de caballo no es recta ni diagonal
+        // Assert: false, ni recta ni diagonal
         assertFalse(result);
     }
 }

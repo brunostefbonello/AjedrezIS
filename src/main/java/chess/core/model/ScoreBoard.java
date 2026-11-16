@@ -3,7 +3,6 @@ package chess.core.model;
 import java.util.EnumMap;
 import java.util.Map;
 
-/** Puntos acumulados por cada color al capturar piezas. */
 public class ScoreBoard {
 
     private final Map<Color, Integer> points = new EnumMap<>(Color.class);

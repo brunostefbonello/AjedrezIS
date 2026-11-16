@@ -24,7 +24,7 @@ class KingMovementTest {
         // Act
         boolean result = king.canMoveTo(from, to, board);
 
-        // Assert — espero true: se mueve 1 casilla en diagonal
+        // Assert: true, 1 casilla en diagonal
         assertTrue(result);
     }
 
@@ -34,13 +34,13 @@ class KingMovementTest {
         Board board = new Board();
         Piece king = Pieces.king(Color.WHITE);
         Position from = new Position(0, 4); // e1
-        Position to = new Position(2, 4);   // e3 (salto de 2 casillas)
+        Position to = new Position(2, 4);   // e3
         board.setPiece(from, king);
 
         // Act
         boolean result = king.canMoveTo(from, to, board);
 
-        // Assert — espero false: intentó moverse 2 casillas
+        // Assert: false, 2 casillas
         assertFalse(result);
     }
 
@@ -53,13 +53,12 @@ class KingMovementTest {
         Position to = new Position(4, 3);
 
         board.setPiece(from, king);
-        // Ponemos un enemigo genérico usando el doble de prueba del convenio
         board.setPiece(to, StubMovement.piece(Color.BLACK, false));
 
         // Act
         boolean result = king.canMoveTo(from, to, board);
 
-        // Assert — espero true: captura moviéndose 1 casilla hacia adelante
+        // Assert: true, captura a 1 casilla
         assertTrue(result);
     }
 }

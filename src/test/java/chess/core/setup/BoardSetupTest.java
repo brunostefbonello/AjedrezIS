@@ -27,7 +27,7 @@ class BoardSetupTest {
         // Act
         Piece[] row = rowOf(board, 0);
 
-        // Assert — espero torre, caballo, alfil, reina, rey, alfil, caballo, torre blancos en la fila 1
+        // Assert: orden estándar, blancas en fila 1
         for (int col = 0; col < 8; col++) {
             assertEquals(BACK_ROW[col], row[col].type());
             assertEquals(Color.WHITE, row[col].color());
@@ -42,7 +42,7 @@ class BoardSetupTest {
         // Act
         Piece[] row = rowOf(board, 7);
 
-        // Assert — espero el mismo orden en negras en la fila 8 (reina en d8, rey en e8)
+        // Assert: mismo orden, negras en fila 8
         for (int col = 0; col < 8; col++) {
             assertEquals(BACK_ROW[col], row[col].type());
             assertEquals(Color.BLACK, row[col].color());
@@ -58,7 +58,7 @@ class BoardSetupTest {
         Piece[] whitePawns = rowOf(board, 1);
         Piece[] blackPawns = rowOf(board, 6);
 
-        // Assert — espero 8 peones blancos en la fila 2 y 8 negros en la fila 7
+        // Assert: peones en filas 2 y 7
         for (int col = 0; col < 8; col++) {
             assertEquals(PieceType.PAWN, whitePawns[col].type());
             assertEquals(Color.WHITE, whitePawns[col].color());
@@ -72,7 +72,7 @@ class BoardSetupTest {
         // Arrange
         Board board = BoardSetup.standard();
 
-        // Act & Assert — espero vacías las filas 3 a 6
+        // Act & Assert: filas 3 a 6 vacías
         for (int row = 2; row <= 5; row++) {
             for (int col = 0; col < 8; col++) {
                 assertNull(board.getPiece(new Position(row, col)));
@@ -88,7 +88,7 @@ class BoardSetupTest {
         // Act
         Piece whitePawn = board.getPiece(new Position(1, 4));   // e2
 
-        // Assert — espero false: si no, el peón no podría avanzar dos casillas en su primer movimiento
+        // Assert: false, si no pierde el doble paso
         assertFalse(whitePawn.hasMoved());
     }
 
@@ -102,7 +102,7 @@ class BoardSetupTest {
         Piece firstPawn = first.getPiece(new Position(1, 0));
         Piece secondPawn = second.getPiece(new Position(1, 0));
 
-        // Assert — espero que no sean la misma pieza: mover en una partida no puede afectar a otra
+        // Assert: piezas distintas entre partidas
         assertNotSame(firstPawn, secondPawn);
     }
 

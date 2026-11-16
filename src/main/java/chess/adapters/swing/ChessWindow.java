@@ -18,7 +18,6 @@ public class ChessWindow extends JFrame {
     private final JButton undoBtn = new JButton("Deshacer jugada");
     private Position selectedPosition = null;
 
-    // Paleta de colores sobrios
     private final java.awt.Color colorClaro = new java.awt.Color(232, 235, 239);
     private final java.awt.Color colorOscuro = new java.awt.Color(152, 164, 175);
     private final java.awt.Color colorSeleccion = new java.awt.Color(235, 123, 102);
@@ -31,9 +30,8 @@ public class ChessWindow extends JFrame {
         setTitle("Ajedrez IS");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new java.awt.Color(248, 249, 250)); // Fondo general claro
+        getContentPane().setBackground(new java.awt.Color(248, 249, 250));
 
-        // Panel superior (Textos de estado)
         JPanel topPanel = new JPanel(new GridLayout(2, 1, 0, 5));
         topPanel.setBorder(new EmptyBorder(15, 10, 10, 10));
         topPanel.setOpaque(false);
@@ -47,19 +45,17 @@ public class ChessWindow extends JFrame {
         topPanel.add(scoreLabel);
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel del tablero: Grilla 9x9 para hacerle lugar a las coordenadas
+        // 9x9: lugar para las coordenadas
         JPanel boardPanel = new JPanel(new GridLayout(9, 9));
         boardPanel.setBorder(new EmptyBorder(0, 15, 0, 15));
         boardPanel.setOpaque(false);
 
         for (int visualRow = 0; visualRow < 8; visualRow++) {
-            // 1. Margen izquierdo: Etiqueta del número de fila (8 a 1)
             JLabel rowLabel = new JLabel(String.valueOf(8 - visualRow), SwingConstants.CENTER);
             rowLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
             rowLabel.setForeground(java.awt.Color.GRAY);
             boardPanel.add(rowLabel);
 
-            // 2. Los 8 botones de la fila
             for (int col = 0; col < 8; col++) {
                 JButton btn = new JButton();
                 btn.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 36));
@@ -101,7 +97,7 @@ public class ChessWindow extends JFrame {
             }
         }
 
-        // Fila 9: Esquina inferior izquierda vacía + Letras (a-h)
+        // Esquina vacía y letras a-h
         boardPanel.add(new JLabel(""));
         char[] columns = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
         for (char c : columns) {
@@ -112,7 +108,6 @@ public class ChessWindow extends JFrame {
         }
         add(boardPanel, BorderLayout.CENTER);
 
-        // Panel inferior (Botón Deshacer)
         JPanel bottomPanel = new JPanel();
         bottomPanel.setBorder(new EmptyBorder(15, 10, 20, 10));
         bottomPanel.setOpaque(false);
@@ -128,7 +123,7 @@ public class ChessWindow extends JFrame {
         bottomPanel.add(undoBtn);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        setSize(620, 740); // Agrandamos un poco la ventana para que entre la grilla 9x9 holgada
+        setSize(620, 740); // Tamaño para la grilla 9x9
         setLocationRelativeTo(null);
         refreshBoard();
         setVisible(true);
@@ -150,7 +145,6 @@ public class ChessWindow extends JFrame {
         }
 
         if (clickedPos.equals(selectedPosition)) {
-            // Clic de nuevo sobre la misma pieza: se deselecciona
             selectedPosition = null;
             refreshBoard();
             return;
@@ -158,7 +152,7 @@ public class ChessWindow extends JFrame {
 
         Piece selectedPiece = game.pieceAt(selectedPosition);
         if (clickedPiece != null && clickedPiece.isAlly(selectedPiece)) {
-            // Clic sobre otra pieza propia: cambia la selección en vez de intentar moverse
+            // Pieza propia: cambia la selección, no mueve
             refreshBoard();
             select(visualRow, col, clickedPos);
             return;
@@ -178,7 +172,7 @@ public class ChessWindow extends JFrame {
         squares[visualRow][col].setBackground(colorSeleccion);
     }
 
-    // Textos de la ventana: viven en el adaptador, el núcleo solo devuelve enums.
+    // Textos en el adaptador; el núcleo da enums
     private static String messageFor(MoveResult result) {
         return switch (result) {
             case OK -> "";
@@ -211,8 +205,7 @@ public class ChessWindow extends JFrame {
                 Piece piece = game.pieceAt(new Position(row, col));
                 squares[visualRow][col].setText(PieceSymbols.get(piece));
 
-                // Todas en negro: el símbolo ya distingue el color (♔ hueco = blancas, ♚ relleno = negras).
-                // Pintarlas en blanco las hacía invisibles sobre las casillas claras.
+                // Siempre negro: en blanco no se ven
                 squares[visualRow][col].setForeground(java.awt.Color.BLACK);
             }
         }

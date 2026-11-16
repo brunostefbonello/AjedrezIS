@@ -5,12 +5,7 @@ import chess.core.model.MovementStrategy;
 import chess.core.model.Piece;
 import chess.core.model.Position;
 
-/**
- * Línea recta (misma fila o misma columna) sin saltar piezas. La usan la torre y la reina.
- *
- * Precondición (la garantiza MoveValidator): en {@code from} está la pieza,
- * from != to y en {@code to} no hay un aliado.
- */
+// La usan la torre y la reina
 public class StraightMovement implements MovementStrategy {
 
     @Override

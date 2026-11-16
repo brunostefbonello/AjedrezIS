@@ -12,16 +12,13 @@ import chess.core.state.WhiteTurnState;
 
 import java.util.Scanner;
 
-/**
- * Segundo adaptador: la misma partida que la ventana, jugada por consola.
- * Usa el mismo núcleo sin cambiarlo (demostración de arquitectura hexagonal).
- */
+// Segundo adaptador: mismo núcleo, sin cambios
 public class ConsoleApp {
 
     private static final int MAX_TURNS = 30;
 
     public static void main(String[] args) {
-        // Ensamble de dependencias: el mismo que SwingApp
+        // Mismo ensamble que SwingApp
         IGameService game = new ChessGame(
                 BoardSetup.standard(),
                 new MoveValidator(),

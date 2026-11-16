@@ -28,7 +28,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(2, 4), board);
 
-        // Assert — espero true: e2 -> e3 con el destino vacío
+        // Assert: true, e2 -> e3 vacío
         assertTrue(result);
     }
 
@@ -42,7 +42,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(3, 4), board);
 
-        // Assert — espero true: e2 -> e4 es válido en el primer movimiento
+        // Assert: true, e2 -> e4 en primer movimiento
         assertTrue(result);
     }
 
@@ -57,7 +57,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(3, 4), board);
 
-        // Assert — espero false: el doble paso es solo para el primer movimiento
+        // Assert: false, doble paso solo al inicio
         assertFalse(result);
     }
 
@@ -71,7 +71,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(4, 4), board);
 
-        // Assert — espero false: ni en el primer movimiento se avanzan tres casillas
+        // Assert: false, nunca tres casillas
         assertFalse(result);
     }
 
@@ -86,7 +86,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(from, new Position(2, 4), board);
 
-        // Assert — espero false: las blancas no retroceden (restar row)
+        // Assert: false, blancas no retroceden
         assertFalse(result);
     }
 
@@ -100,7 +100,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(1, 5), board);
 
-        // Assert — espero false: moverse en la misma fila no es válido
+        // Assert: false, no se mueve de costado
         assertFalse(result);
     }
 
@@ -117,7 +117,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(2, 4), board);
 
-        // Assert — espero false: el peón no captura de frente
+        // Assert: false, no captura de frente
         assertFalse(result);
     }
 
@@ -127,12 +127,12 @@ class PawnMovementTest {
         Board board = new Board();
         Piece pawn = Pieces.pawn(Color.WHITE);
         board.setPiece(E2, pawn);
-        board.setPiece(new Position(2, 4), StubMovement.piece(Color.BLACK, false));   // algo en e3, el destino e4 está vacío
+        board.setPiece(new Position(2, 4), StubMovement.piece(Color.BLACK, false));   // algo en e3; e4 vacío
 
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(3, 4), board);
 
-        // Assert — espero false: hay una pieza en el camino del doble paso
+        // Assert: false, doble paso bloqueado
         assertFalse(result);
     }
 
@@ -147,7 +147,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(3, 4), board);
 
-        // Assert — espero false: el destino del doble paso está ocupado
+        // Assert: false, destino ocupado
         assertFalse(result);
     }
 
@@ -164,7 +164,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(2, 5), board);
 
-        // Assert — espero true: captura en diagonal hacia adelante
+        // Assert: true, captura en diagonal adelante
         assertTrue(result);
     }
 
@@ -179,7 +179,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(2, 3), board);
 
-        // Assert — espero true: la captura vale hacia los dos lados
+        // Assert: true, captura a ambos lados
         assertTrue(result);
     }
 
@@ -193,7 +193,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E2, new Position(2, 5), board);
 
-        // Assert — espero false: sin enemigo en la diagonal no hay captura
+        // Assert: false, diagonal sin enemigo
         assertFalse(result);
     }
 
@@ -209,7 +209,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(from, new Position(2, 5), board);
 
-        // Assert — espero false: la captura es solo hacia adelante
+        // Assert: false, solo captura hacia adelante
         assertFalse(result);
     }
 
@@ -225,7 +225,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E7, new Position(5, 4), board);
 
-        // Assert — espero true: e7 -> e6, las negras avanzan restando row
+        // Assert: true, negras restan row
         assertTrue(result);
     }
 
@@ -239,7 +239,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E7, new Position(4, 4), board);
 
-        // Assert — espero true: e7 -> e5 en el primer movimiento
+        // Assert: true, e7 -> e5 al inicio
         assertTrue(result);
     }
 
@@ -254,7 +254,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(from, new Position(5, 4), board);
 
-        // Assert — espero false: las negras no retroceden (sumar row)
+        // Assert: false, negras no retroceden
         assertFalse(result);
     }
 
@@ -269,7 +269,7 @@ class PawnMovementTest {
         // Act
         boolean result = pawn.canMoveTo(E7, new Position(5, 3), board);
 
-        // Assert — espero true: captura en diagonal hacia adelante (restando row)
+        // Assert: true, captura en diagonal restando row
         assertTrue(result);
     }
 }

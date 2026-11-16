@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Casos migrados de BishopTest: el alfil usa DiagonalMovement.
+// Casos del alfil (ex BishopTest)
 class DiagonalMovementTest {
 
     @Test
@@ -24,7 +24,7 @@ class DiagonalMovementTest {
         // Act
         boolean result = bishop.canMoveTo(new Position(0, 2), new Position(5, 7), board);
 
-        // Assert — espero true: diagonal c1-h6 libre
+        // Assert: true, diagonal c1-h6 libre
         assertTrue(result);
     }
 
@@ -38,7 +38,7 @@ class DiagonalMovementTest {
         // Act
         boolean result = bishop.canMoveTo(new Position(3, 3), new Position(6, 0), board);
 
-        // Assert — espero true: d4 -> a7 (sumando row, restando col), diagonal libre
+        // Assert: true, d4 -> a7 libre
         assertTrue(result);
     }
 
@@ -52,7 +52,7 @@ class DiagonalMovementTest {
         // Act
         boolean result = bishop.canMoveTo(new Position(3, 3), new Position(0, 6), board);
 
-        // Assert — espero true: d4 -> g1 (restando row, sumando col), diagonal libre
+        // Assert: true, d4 -> g1 libre
         assertTrue(result);
     }
 
@@ -66,7 +66,7 @@ class DiagonalMovementTest {
         // Act
         boolean result = bishop.canMoveTo(new Position(0, 2), new Position(4, 2), board);
 
-        // Assert — espero false: el alfil no se mueve en línea recta
+        // Assert: false, no va en recta
         assertFalse(result);
     }
 
@@ -81,7 +81,7 @@ class DiagonalMovementTest {
         // Act
         boolean result = bishop.canMoveTo(new Position(7, 5), new Position(4, 2), board);
 
-        // Assert — espero false: hay una pieza en e7, en el camino
+        // Assert: false, pieza en e7
         assertFalse(result);
     }
 
@@ -96,7 +96,7 @@ class DiagonalMovementTest {
         // Act
         boolean result = bishop.canMoveTo(new Position(7, 5), new Position(3, 1), board);
 
-        // Assert — espero true: el destino tiene un enemigo y el camino está libre
+        // Assert: true, enemigo en destino, camino libre
         assertTrue(result);
     }
 }

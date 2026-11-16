@@ -18,11 +18,10 @@ public class BlackTurnState implements IGameState {
 
     @Override
     public IGameState next() {
-        // Si las negras completaron el último turno, se acabó el juego
+        // Las negras cierran el turno
         if (turn >= maxTurns) {
             return new GameOverState();
         }
-        // Si no, arranca un nuevo turno general para las blancas
         return new WhiteTurnState(turn + 1, maxTurns);
     }
 

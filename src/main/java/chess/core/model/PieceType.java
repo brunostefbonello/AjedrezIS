@@ -1,9 +1,6 @@
 package chess.core.model;
 
-/**
- * Qué pieza es, y cuántos puntos vale capturarla.
- * El rey vale 0 porque capturarlo no suma: termina la partida.
- */
+// Rey vale 0: capturarlo termina la partida
 public enum PieceType {
     PAWN(1),
     KNIGHT(3),

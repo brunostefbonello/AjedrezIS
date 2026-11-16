@@ -6,12 +6,12 @@ public class GameOverState implements IGameState {
 
     @Override
     public boolean canMove(Color color) {
-        return false; // Nadie mueve si terminó
+        return false;
     }
 
     @Override
     public IGameState next() {
-        return this; // Se queda acá
+        return this;
     }
 
     @Override

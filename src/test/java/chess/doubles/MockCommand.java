@@ -2,10 +2,7 @@ package chess.doubles;
 
 import chess.core.commands.ICommand;
 
-/**
- * MOCK: no hace nada real, pero guarda evidencia de cómo lo usaron
- * para poder verificarlo en el Assert.
- */
+// MOCK: solo registra cómo lo usaron
 public class MockCommand implements ICommand {
 
     public int timesExecuteWasCalled = 0;

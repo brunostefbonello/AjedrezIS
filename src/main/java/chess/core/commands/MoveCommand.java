@@ -5,13 +5,7 @@ import chess.core.model.Piece;
 import chess.core.model.Position;
 import chess.core.model.ScoreBoard;
 
-/**
- * Mueve una pieza de {@code from} a {@code to} y sabe revertirlo.
- * Si hay captura, suma el valor de la pieza capturada al que movió.
- *
- * No valida nada: asume que el movimiento ya fue validado antes de crearlo.
- * El undo solo puede revertir lo que execute() se acordó de guardar.
- */
+// No valida: asume un movimiento ya validado
 public class MoveCommand implements ICommand {
 
     private final Board board;
@@ -19,7 +13,7 @@ public class MoveCommand implements ICommand {
     private final Position to;
     private final ScoreBoard scoreBoard;
 
-    // Memoria del comando: se llena en execute() y la usa undo()
+    // Se llenan en execute() y las usa undo()
     private Piece movedPiece;
     private Piece capturedPiece;        // null si no hubo captura
     private boolean wasFirstMove;
@@ -60,20 +54,20 @@ public class MoveCommand implements ICommand {
         }
 
         board.setPiece(from, movedPiece);
-        board.setPiece(to, capturedPiece);            // si era null, la casilla vuelve a quedar vacía
+        board.setPiece(to, capturedPiece);            // si era null, queda vacía
 
         if (wasFirstMove) {
-            movedPiece.resetMoved();                  // solo si ESTE fue su primer movimiento
+            movedPiece.resetMoved();
         }
 
         if (capturedPiece != null) {
-            scoreBoard.subtract(movedPiece.color(), capturedPiece.value());   // devuelvo los puntos
+            scoreBoard.subtract(movedPiece.color(), capturedPiece.value());
         }
 
         executed = false;
     }
 
-    /** La pieza capturada en el último execute(), o null si no hubo captura. */
+    /** null si no hubo captura. */
     public Piece capturedPiece() {
         return capturedPiece;
     }

@@ -18,7 +18,7 @@ class MoveHistoryTest {
         // Act
         history.execute(command);
 
-        // Assert — espero que el historial haya llamado execute() exactamente una vez
+        // Assert: execute() llamado una vez
         assertEquals(1, command.timesExecuteWasCalled);
     }
 
@@ -34,7 +34,7 @@ class MoveHistoryTest {
         // Act
         boolean result = history.undo();
 
-        // Assert — espero true, y que solo se haya deshecho el último (LIFO)
+        // Assert: true, solo deshace el último (LIFO)
         assertTrue(result);
         assertEquals(1, second.timesUndoWasCalled);
         assertEquals(0, first.timesUndoWasCalled);
@@ -48,7 +48,7 @@ class MoveHistoryTest {
         // Act
         boolean result = history.undo();
 
-        // Assert — espero false: no hay nada para deshacer
+        // Assert: false, nada que deshacer
         assertFalse(result);
     }
 }
