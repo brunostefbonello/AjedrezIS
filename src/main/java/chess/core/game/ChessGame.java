@@ -16,19 +16,7 @@ import chess.core.state.IGameState;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-/**
- * Implementa el puerto de entrada. Une las piezas del núcleo:
- * el estado dice de quién es el turno (y cuándo se acaban los turnos),
- * el validador dice si el movimiento es legal, el historial lo ejecuta y lo puede deshacer,
- * y el ScoreBoard lleva los puntos.
- *
- * La partida termina de dos formas:
- *  1. Se captura un rey → gana el que lo capturó, sin importar los puntos.
- *  2. El estado llega a GameOver (límite de turnos) → gana el que tiene más puntos.
- *
- * Todas las dependencias entran por constructor, así esta clase no conoce WhiteTurn
- * y se puede testear con un estado falso y un puntaje preparado.
- */
+// Rey capturado gana; al agotar turnos, gana más puntos
 public class ChessGame implements IGameService {
 
     private final Board board;
@@ -85,8 +73,7 @@ public class ChessGame implements IGameService {
             return false;
         }
         state = previousStates.pop();
-        // Capturar al rey termina la partida, así que solo pudo pasar en el último
-        // movimiento: si deshacemos cualquier movimiento, ya no hay rey capturado.
+        // el rey solo pudo caer en el último movimiento
         kingCapturedBy = null;
         return true;
     }

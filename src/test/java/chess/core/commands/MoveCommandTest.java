@@ -33,7 +33,7 @@ class MoveCommandTest {
         // Act
         command.execute();
 
-        // Assert — espero la pieza en el destino y el origen vacío
+        // Assert: pieza en destino, origen vacío
         assertSame(piece, board.getPiece(new Position(3, 4)));
         assertNull(board.getPiece(new Position(1, 4)));
     }
@@ -49,7 +49,7 @@ class MoveCommandTest {
         // Act
         command.execute();
 
-        // Assert — espero que la pieza quede marcada como movida
+        // Assert: marcada como movida
         assertTrue(piece.hasMoved());
     }
 
@@ -67,7 +67,7 @@ class MoveCommandTest {
         Map<Position, Piece> afterExecute = snapshot(board);
         command.undo();
 
-        // Assert — espero que el execute haya cambiado algo y que el undo lo revierta del todo
+        // Assert: execute cambia, undo revierte todo
         assertNotEquals(before, afterExecute);
         assertEquals(before, snapshot(board));
     }
@@ -84,13 +84,13 @@ class MoveCommandTest {
         command.execute();
         command.undo();
 
-        // Assert — espero que la pieza vuelva a figurar como "nunca se movió"
+        // Assert: vuelve a "nunca se movió"
         assertFalse(piece.hasMoved());
     }
 
     @Test
     void undoOfLaterMoveKeepsMovedFlag() {
-        // Arrange — la pieza ya se movió antes (a1 -> a4), ahora va de a4 a a7
+        // Arrange: ya se movió a1 -> a4; ahora a4 -> a7
         Board board = new Board();
         Piece piece = StubMovement.piece(Color.WHITE, true);
         board.setPiece(new Position(0, 0), piece);
@@ -101,7 +101,7 @@ class MoveCommandTest {
         second.execute();
         second.undo();
 
-        // Assert — espero que vuelva a a4 y SIGA marcada: su primer movimiento no se deshizo
+        // Assert: vuelve a a4 y sigue marcada
         assertSame(piece, board.getPiece(new Position(3, 0)));
         assertTrue(piece.hasMoved());
     }
@@ -112,7 +112,7 @@ class MoveCommandTest {
         Board board = new Board();
         MoveCommand command = new MoveCommand(board, new Position(1, 4), new Position(3, 4), new ScoreBoard());
 
-        // Act + Assert — espero una excepción: no hay nada que deshacer
+        // Act + Assert: excepción, nada que deshacer
         assertThrows(IllegalStateException.class, command::undo);
     }
 
@@ -128,7 +128,7 @@ class MoveCommandTest {
         // Act
         command.execute();
 
-        // Assert — espero 5 puntos para blancas (vale una torre) y 0 para negras
+        // Assert: 5 para blancas (torre), 0 negras
         assertEquals(5, score.score(Color.WHITE));
         assertEquals(0, score.score(Color.BLACK));
     }
@@ -146,7 +146,7 @@ class MoveCommandTest {
         command.execute();
         command.undo();
 
-        // Assert — espero 0: deshacer la captura también deshace los puntos
+        // Assert: 0, el undo devuelve los puntos
         assertEquals(0, score.score(Color.WHITE));
     }
 
@@ -161,15 +161,12 @@ class MoveCommandTest {
         // Act
         command.execute();
 
-        // Assert — espero 0 puntos y ninguna pieza capturada
+        // Assert: 0 puntos, sin captura
         assertEquals(0, score.score(Color.WHITE));
         assertNull(command.capturedPiece());
     }
 
-    /**
-     * Foto del tablero comparable por valor: casilla -> pieza.
-     * Funciona porque Position es un record (equals por valor).
-     */
+    // Comparable por valor porque Position es record
     private static Map<Position, Piece> snapshot(Board board) {
         Map<Position, Piece> pieces = new HashMap<>();
         for (int row = 0; row < 8; row++) {

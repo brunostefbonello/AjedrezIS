@@ -46,7 +46,7 @@ class ChessGameTest {
         // Act
         MoveResult result = game.move(E2, E4);
 
-        // Assert — espero OK y la pieza en e4
+        // Assert: OK y pieza en e4
         assertEquals(MoveResult.OK, result);
         assertSame(piece, game.pieceAt(E4));
         assertNull(game.pieceAt(E2));
@@ -62,7 +62,7 @@ class ChessGameTest {
         // Act
         game.move(E2, E4);
 
-        // Assert — espero que ahora le toque a las negras
+        // Assert: turno de las negras
         assertEquals(Color.BLACK, game.currentTurn());
     }
 
@@ -76,7 +76,7 @@ class ChessGameTest {
         // Act
         MoveResult result = game.move(E7, E5);
 
-        // Assert — espero NOT_YOUR_TURN y el tablero sin cambios
+        // Assert: NOT_YOUR_TURN, tablero sin cambios
         assertEquals(MoveResult.NOT_YOUR_TURN, result);
         assertNull(game.pieceAt(E5));
     }
@@ -91,7 +91,7 @@ class ChessGameTest {
         // Act
         MoveResult result = game.move(E2, E4);
 
-        // Assert — espero INVALID_MOVE y que siga siendo turno de las blancas
+        // Assert: INVALID_MOVE, sigue turno de blancas
         assertEquals(MoveResult.INVALID_MOVE, result);
         assertEquals(Color.WHITE, game.currentTurn());
     }
@@ -108,7 +108,7 @@ class ChessGameTest {
         // Act
         boolean result = game.undo();
 
-        // Assert — espero la pieza de vuelta en e2 y el turno otra vez de las blancas
+        // Assert: pieza en e2, turno de blancas
         assertTrue(result);
         assertSame(piece, game.pieceAt(E2));
         assertNull(game.pieceAt(E4));
@@ -123,7 +123,7 @@ class ChessGameTest {
         // Act
         boolean result = game.undo();
 
-        // Assert — espero false y el turno intacto
+        // Assert: false, turno intacto
         assertFalse(result);
         assertEquals(Color.WHITE, game.currentTurn());
     }
@@ -138,7 +138,7 @@ class ChessGameTest {
         // Act
         MoveResult result = game.move(E2, E4);
 
-        // Assert — espero GAME_OVER, sin turno y sin mover nada
+        // Assert: GAME_OVER, sin turno ni movimiento
         assertEquals(MoveResult.GAME_OVER, result);
         assertTrue(game.isOver());
         assertNull(game.currentTurn());
@@ -156,14 +156,14 @@ class ChessGameTest {
         // Act
         game.move(E4, E5);
 
-        // Assert — espero 3 puntos para blancas (vale un caballo)
+        // Assert: 3 para blancas (caballo)
         assertEquals(3, game.score(Color.WHITE));
         assertEquals(0, game.score(Color.BLACK));
     }
 
     @Test
     void capturingTheKingEndsTheGameAndCapturerWins() {
-        // Arrange — negras van ganando en puntos, pero blancas capturan al rey
+        // Arrange: negras van ganando en puntos
         Board board = new Board();
         ScoreBoard score = new ScoreBoard();
         score.add(Color.BLACK, 20);
@@ -174,7 +174,7 @@ class ChessGameTest {
         // Act
         game.move(E4, E5);
 
-        // Assert — espero partida terminada, ganador blancas y sin turno
+        // Assert: terminada, ganan blancas, sin turno
         assertTrue(game.isOver());
         assertEquals(Color.WHITE, game.winner());
         assertNull(game.currentTurn());
@@ -192,7 +192,7 @@ class ChessGameTest {
         // Act
         game.undo();
 
-        // Assert — espero partida en curso, sin ganador y otra vez turno de blancas
+        // Assert: en curso, sin ganador, turno de blancas
         assertFalse(game.isOver());
         assertNull(game.winner());
         assertEquals(Color.WHITE, game.currentTurn());
@@ -200,7 +200,7 @@ class ChessGameTest {
 
     @Test
     void whenTurnsRunOutHigherScoreWins() {
-        // Arrange — el estado ya está en fin de partida (se acabaron los turnos)
+        // Arrange: turnos ya agotados
         ScoreBoard score = new ScoreBoard();
         score.add(Color.WHITE, 4);
         score.add(Color.BLACK, 9);
@@ -209,7 +209,7 @@ class ChessGameTest {
         // Act
         Color winner = game.winner();
 
-        // Assert — espero que ganen las negras: tienen más puntos
+        // Assert: ganan negras, más puntos
         assertEquals(Color.BLACK, winner);
     }
 
@@ -224,7 +224,7 @@ class ChessGameTest {
         // Act
         Color winner = game.winner();
 
-        // Assert — espero null con la partida terminada: empate
+        // Assert: null con partida terminada, empate
         assertTrue(game.isOver());
         assertNull(winner);
     }
@@ -239,7 +239,7 @@ class ChessGameTest {
         // Act
         Color winner = game.winner();
 
-        // Assert — espero null: la partida sigue, aunque blancas vayan ganando
+        // Assert: null, la partida sigue
         assertNull(winner);
     }
 }

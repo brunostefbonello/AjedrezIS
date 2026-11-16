@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Casos migrados de RookTest: la torre usa StraightMovement.
+// Casos de la torre (ex RookTest)
 class StraightMovementTest {
 
     @Test
@@ -24,7 +24,7 @@ class StraightMovementTest {
         // Act
         boolean result = rook.canMoveTo(new Position(0, 0), new Position(5, 0), board);
 
-        // Assert — espero true: columna libre
+        // Assert: true, columna libre
         assertTrue(result);
     }
 
@@ -38,7 +38,7 @@ class StraightMovementTest {
         // Act
         boolean result = rook.canMoveTo(new Position(7, 7), new Position(7, 2), board);
 
-        // Assert — espero true: fila libre
+        // Assert: true, fila libre
         assertTrue(result);
     }
 
@@ -52,7 +52,7 @@ class StraightMovementTest {
         // Act
         boolean result = rook.canMoveTo(new Position(4, 3), new Position(0, 3), board);
 
-        // Assert — espero true: d5 -> d1 (restando row), columna libre
+        // Assert: true, d5 -> d1 libre
         assertTrue(result);
     }
 
@@ -66,7 +66,7 @@ class StraightMovementTest {
         // Act
         boolean result = rook.canMoveTo(new Position(4, 3), new Position(4, 7), board);
 
-        // Assert — espero true: d5 -> h5 (sumando col), fila libre
+        // Assert: true, d5 -> h5 libre
         assertTrue(result);
     }
 
@@ -80,7 +80,7 @@ class StraightMovementTest {
         // Act
         boolean result = rook.canMoveTo(new Position(0, 0), new Position(3, 3), board);
 
-        // Assert — espero false: la torre no se mueve en diagonal
+        // Assert: false, no va en diagonal
         assertFalse(result);
     }
 
@@ -95,7 +95,7 @@ class StraightMovementTest {
         // Act
         boolean result = rook.canMoveTo(new Position(0, 0), new Position(5, 0), board);
 
-        // Assert — espero false: hay una pieza en el camino
+        // Assert: false, camino bloqueado
         assertFalse(result);
     }
 
@@ -110,7 +110,7 @@ class StraightMovementTest {
         // Act
         boolean result = rook.canMoveTo(new Position(0, 0), new Position(0, 6), board);
 
-        // Assert — espero true: el destino tiene un enemigo y el camino está libre
+        // Assert: true, enemigo en destino, camino libre
         assertTrue(result);
     }
 }

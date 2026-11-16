@@ -23,7 +23,7 @@ class MoveValidatorTest {
         // Act
         boolean result = validator.isValidMove(board, new Position(1, 4), new Position(3, 4));
 
-        // Assert — espero false: no hay pieza en el origen
+        // Assert: false, origen vacío
         assertFalse(result);
     }
 
@@ -36,7 +36,7 @@ class MoveValidatorTest {
         // Act
         boolean result = validator.isValidMove(board, new Position(1, 4), new Position(1, 4));
 
-        // Assert — espero false aunque la pieza diga que sí: origen y destino son iguales
+        // Assert: false, origen igual a destino
         assertFalse(result);
     }
 
@@ -50,7 +50,7 @@ class MoveValidatorTest {
         // Act
         boolean result = validator.isValidMove(board, new Position(0, 0), new Position(0, 5));
 
-        // Assert — espero false: en el destino hay una pieza del mismo color
+        // Assert: false, aliado en destino
         assertFalse(result);
     }
 
@@ -64,7 +64,7 @@ class MoveValidatorTest {
         // Act
         boolean result = validator.isValidMove(board, new Position(0, 0), new Position(0, 5));
 
-        // Assert — espero true: hay un enemigo en el destino y la pieza puede llegar
+        // Assert: true, enemigo en destino
         assertTrue(result);
     }
 
@@ -77,7 +77,7 @@ class MoveValidatorTest {
         // Act
         boolean result = validator.isValidMove(board, new Position(0, 0), new Position(4, 4));
 
-        // Assert — espero false: los chequeos generales pasan, pero la pieza dice que no
+        // Assert: false, la pieza dice que no
         assertFalse(result);
     }
 
@@ -91,7 +91,7 @@ class MoveValidatorTest {
         // Act
         validator.isValidMove(board, new Position(0, 0), new Position(4, 4));
 
-        // Assert — espero que la pieza siga en el origen y sin marcar: validar solo pregunta
+        // Assert: pieza en origen y sin marcar
         assertSame(piece, board.getPiece(new Position(0, 0)));
         assertTrue(board.isEmpty(new Position(4, 4)));
         assertFalse(piece.hasMoved());

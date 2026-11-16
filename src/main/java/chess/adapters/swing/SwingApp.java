@@ -15,13 +15,13 @@ public class SwingApp {
     private static final int MAX_TURNS = 30;
 
     public static void main(String[] args) {
-        // Ensamble de dependencias: único lugar donde se arma todo con new
+        // Único lugar que arma todo con new
         IGameService game = new ChessGame(
                 BoardSetup.standard(),
                 new MoveValidator(),
                 new MoveHistory(),
                 new ScoreBoard(),
-                new WhiteTurnState(1, MAX_TURNS));     // turno 1 de 30
+                new WhiteTurnState(1, MAX_TURNS));
 
         // La ventana se crea en el hilo de Swing
         SwingUtilities.invokeLater(() -> new ChessWindow(game));

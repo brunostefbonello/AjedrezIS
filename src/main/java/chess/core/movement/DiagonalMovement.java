@@ -5,12 +5,7 @@ import chess.core.model.MovementStrategy;
 import chess.core.model.Piece;
 import chess.core.model.Position;
 
-/**
- * Diagonal (misma distancia en filas y columnas) sin saltar piezas. La usan el alfil y la reina.
- *
- * Precondición (la garantiza MoveValidator): en {@code from} está la pieza,
- * from != to y en {@code to} no hay un aliado.
- */
+// La usan el alfil y la reina
 public class DiagonalMovement implements MovementStrategy {
 
     @Override

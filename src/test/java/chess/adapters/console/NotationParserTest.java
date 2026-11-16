@@ -32,12 +32,12 @@ class NotationParserTest {
         NotationParser parser = new NotationParser();
 
         // Act & Assert
-        // Fuera de rango de columnas o filas
+        // Fuera de rango
         assertNull(parser.parse("i1"));
         assertNull(parser.parse("a9"));
         assertNull(parser.parse("z0"));
 
-        // Formatos incorrectos o longitudes inválidas
+        // Formato o longitud inválidos
         assertNull(parser.parse("e"));
         assertNull(parser.parse("e22"));
         assertNull(parser.parse(""));

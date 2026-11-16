@@ -16,9 +16,7 @@ public class Board {
         return getPiece(position) == null;
     }
 
-    // true si todas las casillas ESTRICTAMENTE entre from y to están vacías.
-    // Solo tiene sentido para líneas rectas y diagonales: para cualquier otra
-    // dirección devuelve false (no hay un "camino" que recorrer).
+    // Solo casillas intermedias; false si no es recta ni diagonal
     public boolean isPathClear(Position from, Position to) {
         int rowDiff = to.row() - from.row();
         int colDiff = to.col() - from.col();

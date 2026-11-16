@@ -3,10 +3,7 @@ package chess.doubles;
 import chess.core.model.Color;
 import chess.core.state.IGameState;
 
-/**
- * FAKE: funciona de verdad (alterna turnos), pero es una versión simplificada
- * de los estados reales. Permite testear ChessGame sin esperar a WhiteTurn/BlackTurn.
- */
+// FAKE: alterna turnos de verdad, simplificado
 public class FakeTurnState implements IGameState {
 
     private final Color turn;

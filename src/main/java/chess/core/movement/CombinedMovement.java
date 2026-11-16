@@ -7,10 +7,7 @@ import chess.core.model.Position;
 
 import java.util.List;
 
-/**
- * Se puede mover si CUALQUIERA de las estrategias lo permite.
- * La reina es Straight + Diagonal: reutiliza las dos en vez de repetir su lógica.
- */
+// Para la reina: Straight + Diagonal
 public class CombinedMovement implements MovementStrategy {
 
     private final List<MovementStrategy> options;

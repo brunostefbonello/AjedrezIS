@@ -1,9 +1,6 @@
 package chess.core.commands;
 
-/**
- * Una acción convertida en objeto (patrón Command).
- * Al existir como objeto, se puede guardar en un historial y deshacer.
- */
+// Patrón Command: permite historial y deshacer
 public interface ICommand {
 
     void execute();

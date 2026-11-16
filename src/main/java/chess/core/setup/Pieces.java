@@ -10,17 +10,7 @@ import chess.core.movement.KnightMovement;
 import chess.core.movement.PawnMovement;
 import chess.core.movement.StraightMovement;
 
-/**
- * Único lugar donde se decide qué estrategia lleva cada tipo de pieza.
- * Así nadie arma por error una torre con movimiento diagonal.
- *
- * Cada integrante agrega acá el método de sus piezas, por ejemplo:
- *
- *     public static Piece rook(Color color) {
- *         return new Piece(color, PieceType.ROOK, new StraightMovement());
- *     }
- *
- */
+// Único lugar que asigna estrategia a cada tipo
 public final class Pieces {
 
     private Pieces() {
@@ -34,7 +24,6 @@ public final class Pieces {
         return new Piece(color, PieceType.BISHOP, new DiagonalMovement());
     }
 
-    // La reina no tiene clase propia: combina los movimientos de la torre y el alfil.
     public static Piece queen(Color color) {
         return new Piece(color, PieceType.QUEEN,
                 new CombinedMovement(new StraightMovement(), new DiagonalMovement()));

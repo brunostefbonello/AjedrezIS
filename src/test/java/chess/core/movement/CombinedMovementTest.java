@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Casos migrados de QueenTest: la reina = Straight + Diagonal combinados.
+// Casos de la reina (ex QueenTest)
 class CombinedMovementTest {
 
     @Test
@@ -24,7 +24,7 @@ class CombinedMovementTest {
         // Act
         boolean result = queen.canMoveTo(new Position(0, 3), new Position(6, 3), board);
 
-        // Assert — espero true: columna libre
+        // Assert: true, columna libre
         assertTrue(result);
     }
 
@@ -38,7 +38,7 @@ class CombinedMovementTest {
         // Act
         boolean result = queen.canMoveTo(new Position(0, 3), new Position(3, 0), board);
 
-        // Assert — espero true: diagonal d1-a4 libre
+        // Assert: true, diagonal d1-a4 libre
         assertTrue(result);
     }
 
@@ -52,7 +52,7 @@ class CombinedMovementTest {
         // Act
         boolean result = queen.canMoveTo(new Position(0, 3), new Position(2, 4), board);
 
-        // Assert — espero false: ni recta ni diagonal
+        // Assert: false, ni recta ni diagonal
         assertFalse(result);
     }
 
@@ -67,7 +67,7 @@ class CombinedMovementTest {
         // Act
         boolean result = queen.canMoveTo(new Position(0, 3), new Position(6, 3), board);
 
-        // Assert — espero false: hay un enemigo en d4; se captura en el destino, no se salta
+        // Assert: false, no salta al enemigo en d4
         assertFalse(result);
     }
 
@@ -82,7 +82,7 @@ class CombinedMovementTest {
         // Act
         boolean result = queen.canMoveTo(new Position(7, 3), new Position(3, 7), board);
 
-        // Assert — espero false: hay una pieza en f6, en la diagonal
+        // Assert: false, pieza en f6
         assertFalse(result);
     }
 
@@ -97,7 +97,7 @@ class CombinedMovementTest {
         // Act
         boolean result = queen.canMoveTo(new Position(7, 3), new Position(1, 3), board);
 
-        // Assert — espero true: el destino tiene un enemigo y el camino está libre
+        // Assert: true, enemigo en destino, camino libre
         assertTrue(result);
     }
 
@@ -110,7 +110,7 @@ class CombinedMovementTest {
         // Act
         boolean result = movement.canMove(null, new Position(0, 0), new Position(5, 5), board);
 
-        // Assert — espero true: alcanza con que una de las estrategias diga que sí
+        // Assert: true, basta con una
         assertTrue(result);
     }
 
@@ -123,7 +123,7 @@ class CombinedMovementTest {
         // Act
         boolean result = movement.canMove(null, new Position(0, 0), new Position(5, 5), board);
 
-        // Assert — espero false: ninguna estrategia lo permite
+        // Assert: false, ninguna lo permite
         assertFalse(result);
     }
 }

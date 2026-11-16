@@ -12,7 +12,6 @@ public class KingMovement implements MovementStrategy {
         int deltaRow = Math.abs(to.row() - from.row());
         int deltaCol = Math.abs(to.col() - from.col());
 
-        // El rey se mueve exactamente 1 casilla en cualquier dirección
         return deltaRow <= 1 && deltaCol <= 1;
     }
 }

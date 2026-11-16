@@ -25,7 +25,7 @@ class KnightMovementTest {
         // Act
         boolean result = knight.canMoveTo(B1, new Position(2, 2), board);
 
-        // Assert — espero true: b1 -> c3 es una "L" (2 en fila, 1 en columna)
+        // Assert: true, b1 -> c3 es una "L"
         assertTrue(result);
     }
 
@@ -39,7 +39,7 @@ class KnightMovementTest {
         // Act
         boolean result = knight.canMoveTo(B1, new Position(1, 3), board);
 
-        // Assert — espero true: b1 -> d2 es una "L" (1 en fila, 2 en columna)
+        // Assert: true, b1 -> d2 es una "L"
         assertTrue(result);
     }
 
@@ -54,7 +54,7 @@ class KnightMovementTest {
         // Act
         boolean result = knight.canMoveTo(from, new Position(2, 3), board);
 
-        // Assert — espero true: la "L" vale en cualquier dirección, también hacia atrás
+        // Assert: true, la "L" vale hacia atrás
         assertTrue(result);
     }
 
@@ -68,7 +68,7 @@ class KnightMovementTest {
         // Act
         boolean result = knight.canMoveTo(B1, new Position(3, 1), board);
 
-        // Assert — espero false: avanzar recto no es una "L"
+        // Assert: false, recto no es "L"
         assertFalse(result);
     }
 
@@ -82,7 +82,7 @@ class KnightMovementTest {
         // Act
         boolean result = knight.canMoveTo(B1, new Position(2, 3), board);
 
-        // Assert — espero false: b1 -> d3 es una diagonal (2 y 2), no una "L"
+        // Assert: false, b1 -> d3 es diagonal
         assertFalse(result);
     }
 
@@ -96,13 +96,13 @@ class KnightMovementTest {
         // Act
         boolean result = knight.canMoveTo(B1, new Position(1, 1), board);
 
-        // Assert — espero false: una sola casilla es muy poco para una "L"
+        // Assert: false, una casilla no es "L"
         assertFalse(result);
     }
 
     @Test
     void knightJumpsOverSurroundingPieces() {
-        // Arrange — el caballo está rodeado de piezas en todas las casillas contiguas
+        // Arrange: caballo rodeado de piezas
         Board board = new Board();
         Piece knight = Pieces.knight(Color.WHITE);
         Position from = new Position(3, 3);
@@ -118,7 +118,7 @@ class KnightMovementTest {
         // Act
         boolean result = knight.canMoveTo(from, new Position(5, 4), board);
 
-        // Assert — espero true: el caballo salta y no le importa lo que haya en el camino
+        // Assert: true, el caballo salta
         assertTrue(result);
     }
 
@@ -133,7 +133,7 @@ class KnightMovementTest {
         // Act
         boolean result = knight.canMoveTo(B1, new Position(2, 2), board);
 
-        // Assert — espero true: la geometría permite llegar y el enemigo se captura
+        // Assert: true, captura al enemigo
         assertTrue(result);
     }
 }

@@ -18,7 +18,7 @@ public class WhiteTurnState implements IGameState {
 
     @Override
     public IGameState next() {
-        // Pasa el turno a las negras, pero seguimos en el mismo número de turno general
+        // Mismo número de turno: lo cierran las negras
         return new BlackTurnState(turn, maxTurns);
     }
 

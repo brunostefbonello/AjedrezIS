@@ -39,7 +39,7 @@ public class ConsoleRenderer {
         }
     }
 
-    // Mayúscula = blancas, minúscula = negras (notación inglesa: N = caballo)
+    // Notación inglesa (N = caballo); negras en minúscula
     private String getPieceSymbol(Piece piece) {
         if (piece == null) {
             return " ";

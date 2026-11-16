@@ -13,7 +13,6 @@ public class NotationParser {
         char colChar = cleaned.charAt(0);
         char rowChar = cleaned.charAt(1);
 
-        // Rango fijo 8x8 del convenio: 'a'..'h' y '1'..'8'
         if (colChar < 'a' || colChar > 'h' || rowChar < '1' || rowChar > '8') {
             return null;
         }

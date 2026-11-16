@@ -1,12 +1,6 @@
 package chess.core.model;
 
-/**
- * Una pieza del tablero: color, tipo (con su valor) y una estrategia de movimiento.
- *
- * Es {@code final} a propósito: las piezas ya no se diferencian por herencia,
- * sino por la MovementStrategy que reciben (composición).
- * Para crearlas usar {@code chess.core.setup.Pieces}.
- */
+// final: varía por estrategia, no por herencia. Crear con Pieces
 public final class Piece {
 
     private final Color color;
@@ -28,7 +22,7 @@ public final class Piece {
         return type;
     }
 
-    /** Puntos que gana el rival al capturar esta pieza. */
+    /** Puntos para quien la captura. */
     public int value() {
         return type.value();
     }
@@ -49,7 +43,6 @@ public final class Piece {
         return other != null && other.color == this.color;
     }
 
-    /** Delega en la estrategia: la pieza no sabe cómo se mueve, se lo pregunta a su movimiento. */
     public boolean canMoveTo(Position from, Position to, Board board) {
         return movement.canMove(this, from, to, board);
     }

@@ -20,7 +20,7 @@ class PieceTest {
         boolean yesResult = yes.canMoveTo(new Position(0, 0), new Position(5, 5), board);
         boolean noResult = no.canMoveTo(new Position(0, 0), new Position(5, 5), board);
 
-        // Assert — espero que cada pieza responda lo que dice su estrategia, mismo tipo y todo
+        // Assert: cada una responde según su estrategia
         assertTrue(yesResult);
         assertFalse(noResult);
     }
@@ -33,7 +33,7 @@ class PieceTest {
         // Act
         int value = queen.value();
 
-        // Assert — espero 9: lo que vale una reina
+        // Assert: 9, valor de la reina
         assertEquals(9, value);
     }
 }
